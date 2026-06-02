@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medusa Capital — Income</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">⚡ Medusa Capital</div>
+    <div class="nav-links">
+      <a href="index.html">Dashboard</a>
+      <a href="positions.html">Positions</a>
+      <a href="transactions.html">Transactions</a>
+      <a href="income.html" class="active">Income</a>
+      <a href="upload.html">Upload</a>
+    </div>
+  </nav>
+  <main class="container">
+    <div class="page-header">
+      <h1>Dividends &amp; Income</h1>
+      <p class="subtitle" id="subtitle">Loading...</p>
+    </div>
+    <div class="kpi-grid" style="--kpi-cols:3">
+      <div class="kpi-card"><div class="kpi-label">Total Income (All Time)</div><div class="kpi-value positive" id="kpi-total">—</div></div>
+      <div class="kpi-card"><div class="kpi-label">YTD Income (CAD equiv.)</div><div class="kpi-value positive" id="kpi-ytd">—</div></div>
+      <div class="kpi-card"><div class="kpi-label">Unique Payers</div><div class="kpi-value" id="kpi-payers">—</div></div>
+    </div>
+    <div class="card">
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>Date</th><th>Type</th><th>Ticker</th><th>Description</th>
+            <th class="num">Amount</th><th>Currency</th><th class="num">YTD Total</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/charts.js"></script>
+  <script>
+    async function init() {
+      const income = await Data.income();
+      const snap = await Data.latestSnapshot();
+      const rate = snap?.fx_rate || 1.36;
+      document.getElementById('subtitle').textContent = income.length + ' payments recorded';
+      const toCAD = i => i.currency==='CAD' ? i.amount : i.amount * rate;
+      document.getElementById('kpi-total').textContent = formatCAD(income.reduce((s,i)=>s+toCAD(i),0));
+      const yr = new Date().getFullYear().toString();
+      document.getElementById('kpi-ytd').textContent = formatCAD(income.filter(i=>i.date?.startsWith(yr)).reduce((s,i)=>s+toCAD(i),0));
+      document.getElementById('kpi-payers').textContent = new Set(income.map(i=>i.ticker).filter(Boolean)).size;
+      const tbody = document.getElementById('tbody');
+      if (!income.length) { tbody.innerHTML='<tr><td colspan="7" class="empty">No income recorded yet.</td></tr>'; return; }
+      tbody.innerHTML = income.map(i => `
+        <tr>
+          <td>${formatDate(i.date)}</td>
+          <td><span class="badge badge-purple">${i.type}</span></td>
+          <td>${i.ticker?`<span class="ticker-badge">${i.ticker}</span>`:'—'}</td>
+          <td class="desc">${i.description}</td>
+          <td class="num positive">${i.currency==='CAD'?formatCAD(i.amount):formatUSD(i.amount)}</td>
+          <td><span class="currency-tag ${i.currency}">${i.currency}</span></td>
+          <td class="num">${i.ytd_total!=null?(i.currency==='CAD'?formatCAD(i.ytd_total):formatUSD(i.ytd_total)):'—'}</td>
+        </tr>`).join('');
+    }
+    init();
+  </script>
+</body>
+</html>

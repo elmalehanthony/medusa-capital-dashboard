@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medusa Capital — Positions</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">⚡ Medusa Capital</div>
+    <div class="nav-links">
+      <a href="index.html">Dashboard</a>
+      <a href="positions.html" class="active">Positions</a>
+      <a href="transactions.html">Transactions</a>
+      <a href="income.html">Income</a>
+      <a href="upload.html">Upload</a>
+    </div>
+  </nav>
+  <main class="container">
+    <div class="page-header">
+      <div>
+        <h1>Positions</h1>
+        <p class="subtitle" id="subtitle">Loading...</p>
+      </div>
+      <div class="filter-bar">
+        <select id="filter-currency"><option value="all">All Currencies</option><option value="CAD">CAD</option><option value="USD">USD</option></select>
+        <select id="filter-sector"><option value="all">All Sectors</option></select>
+        <select id="sort-by">
+          <option value="pf_weight">Sort: Portfolio Weight</option>
+          <option value="return_inception">Sort: Return (Inception)</option>
+          <option value="return_last_month">Sort: Return (Month)</option>
+          <option value="current_value_cad">Sort: Value (CAD)</option>
+          <option value="ticker">Sort: Ticker A–Z</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>Ticker</th><th>Name</th><th>Sector</th>
+            <th class="num">Shares</th><th class="num">Cost/Share</th><th class="num">Total Cost</th>
+            <th class="num">Price</th><th class="num">Value</th><th class="num">Value CAD</th>
+            <th class="num">Weight</th><th class="num">Return (Inception)</th><th class="num">Return (Month)</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/charts.js"></script>
+  <script>
+    let all = [];
+    function render(positions) {
+      const tbody = document.getElementById('tbody');
+      if (!positions.length) {
+        tbody.innerHTML = '<tr><td colspan="12" class="empty">No positions. Upload a statement to populate.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = positions.map(p => `
+        <tr>
+          <td><span class="ticker-badge ${p.currency}">${p.ticker}</span></td>
+          <td>${p.name}</td>
+          <td><span class="sector-tag">${p.sector||'—'}</span></td>
+          <td class="num">${p.shares}</td>
+          <td class="num">${p.currency==='CAD'?formatCAD(p.cost_per_share):formatUSD(p.cost_per_share)}</td>
+          <td class="num">${p.currency==='CAD'?formatCAD(p.total_cost):formatUSD(p.total_cost)}</td>
+          <td class="num">${p.currency==='CAD'?formatCAD(p.current_price):formatUSD(p.current_price)}</td>
+          <td class="num">${p.currency==='CAD'?formatCAD(p.current_value):formatUSD(p.current_value)}</td>
+          <td class="num">${formatCAD(p.current_value_cad)}</td>
+          <td class="num">${p.pf_weight!=null?(p.pf_weight*100).toFixed(1)+'%':'—'}</td>
+          <td class="num ${(p.return_inception||0)>=0?'positive':'negative'}">${formatPct(p.return_inception)}</td>
+          <td class="num ${(p.return_last_month||0)>=0?'positive':'negative'}">${formatPct(p.return_last_month)}</td>
+        </tr>`).join('');
+    }
+    function applyFilters() {
+      const cur = document.getElementById('filter-currency').value;
+      const sec = document.getElementById('filter-sector').value;
+      const sort = document.getElementById('sort-by').value;
+      let filtered = all.filter(p => cur==='all'||p.currency===cur).filter(p => sec==='all'||p.sector===sec);
+      filtered.sort((a,b) => sort==='ticker' ? a.ticker.localeCompare(b.ticker) : (b[sort]||0)-(a[sort]||0));
+      render(filtered);
+    }
+    async function init() {
+      all = await Data.positions();
+      const snap = await Data.latestSnapshot();
+      document.getElementById('subtitle').textContent = snap
+        ? all.length + ' holdings as of ' + formatDate(snap.date)
+        : 'No data — upload a statement';
+      const sectors = [...new Set(all.map(p=>p.sector).filter(Boolean))].sort();
+      const sel = document.getElementById('filter-sector');
+      sectors.forEach(s => { const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); });
+      ['filter-currency','filter-sector','sort-by'].forEach(id =>
+        document.getElementById(id).addEventListener('change', applyFilters));
+      applyFilters();
+    }
+    init();
+  </script>
+</body>
+</html>

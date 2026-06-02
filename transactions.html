@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medusa Capital — Transactions</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">⚡ Medusa Capital</div>
+    <div class="nav-links">
+      <a href="index.html">Dashboard</a>
+      <a href="positions.html">Positions</a>
+      <a href="transactions.html" class="active">Transactions</a>
+      <a href="income.html">Income</a>
+      <a href="upload.html">Upload</a>
+    </div>
+  </nav>
+  <main class="container">
+    <div class="page-header">
+      <div>
+        <h1>Transactions</h1>
+        <p class="subtitle" id="subtitle">Loading...</p>
+      </div>
+      <div class="filter-bar">
+        <select id="filter-type">
+          <option value="all">All Types</option>
+          <option value="buy">Buy</option><option value="sell">Sell</option>
+          <option value="deposit">Deposit</option><option value="withdrawal">Withdrawal</option>
+          <option value="dividend">Dividend</option><option value="fx">FX</option><option value="fee">Fee</option>
+        </select>
+        <select id="filter-currency"><option value="all">All Currencies</option><option value="CAD">CAD</option><option value="USD">USD</option></select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>Date</th><th>Type</th><th>Ticker</th><th>Description</th>
+            <th class="num">Qty</th><th class="num">Price</th><th class="num">Commission</th>
+            <th class="num">Amount</th><th>Currency</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/charts.js"></script>
+  <script>
+    const TYPE_CLASS = { buy:'badge-blue', sell:'badge-red', deposit:'badge-green', withdrawal:'badge-orange', dividend:'badge-purple', fx:'badge-gray', fee:'badge-orange', interest:'badge-purple' };
+    let all = [];
+    function render(txns) {
+      const tbody = document.getElementById('tbody');
+      if (!txns.length) { tbody.innerHTML='<tr><td colspan="9" class="empty">No transactions yet.</td></tr>'; return; }
+      tbody.innerHTML = txns.map(t => `
+        <tr>
+          <td>${formatDate(t.date)}</td>
+          <td><span class="badge ${TYPE_CLASS[t.type]||'badge-gray'}">${t.type}</span></td>
+          <td>${t.ticker?`<span class="ticker-badge">${t.ticker}</span>`:'—'}</td>
+          <td class="desc">${t.description}</td>
+          <td class="num">${t.quantity!=null?t.quantity:'—'}</td>
+          <td class="num">${t.unit_price!=null?(t.currency==='CAD'?formatCAD(t.unit_price):formatUSD(t.unit_price)):'—'}</td>
+          <td class="num">${t.commission?(t.currency==='CAD'?formatCAD(t.commission):formatUSD(t.commission)):'—'}</td>
+          <td class="num ${t.amount>=0?'positive':'negative'}">${t.currency==='CAD'?formatCAD(t.amount):formatUSD(t.amount)}</td>
+          <td><span class="currency-tag ${t.currency}">${t.currency}</span></td>
+        </tr>`).join('');
+    }
+    function applyFilters() {
+      const type = document.getElementById('filter-type').value;
+      const cur = document.getElementById('filter-currency').value;
+      render(all.filter(t=>type==='all'||t.type===type).filter(t=>cur==='all'||t.currency===cur));
+    }
+    async function init() {
+      all = await Data.transactions();
+      document.getElementById('subtitle').textContent = all.length + ' transactions';
+      ['filter-type','filter-currency'].forEach(id => document.getElementById(id).addEventListener('change', applyFilters));
+      applyFilters();
+    }
+    init();
+  </script>
+</body>
+</html>
