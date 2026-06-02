@@ -1,0 +1,56 @@
+{
+  "account": {
+    "number": "230-32415",
+    "name": "Medusa Capital",
+    "inception_date": "2020-03-17"
+  },
+  "snapshots": [
+    {
+      "date": "2026-04-30",
+      "total_cad": 145783.96,
+      "cad_holdings": 31540.78,
+      "usd_holdings_usd": 84101.28,
+      "fx_rate": 1.3584,
+      "net_invested_ytd": -6016.18,
+      "net_invested_inception": 87005.85,
+      "market_change_ytd": 3332.06,
+      "market_change_inception": 58778.11
+    },
+    {
+      "date": "2026-03-31",
+      "total_cad": 133696.49,
+      "cad_holdings": 29062.96,
+      "usd_holdings_usd": 75089.55,
+      "fx_rate": 1.39345,
+      "net_invested_ytd": -6716.18,
+      "net_invested_inception": 86305.85,
+      "market_change_ytd": -8055.41,
+      "market_change_inception": 47390.64
+    },
+    {
+      "date": "2026-02-28",
+      "total_cad": 138629.63,
+      "cad_holdings": 31449.54,
+      "usd_holdings_usd": 78623.89,
+      "fx_rate": 1.3632,
+      "net_invested_ytd": -6716.18,
+      "net_invested_inception": 86305.85,
+      "market_change_ytd": -3122.27,
+      "market_change_inception": 52323.78
+    },
+    {
+      "date": "2026-01-31",
+      "total_cad": 135843.92,
+      "cad_holdings": 30213.96,
+      "usd_holdings_usd": 77731.96,
+      "fx_rate": 1.3589,
+      "net_invested_ytd": -8215.18,
+      "net_invested_inception": 84806.85,
+      "market_change_ytd": -4408.98,
+      "market_change_inception": 51037.07
+    }
+  ],
+  "positions": [],
+  "transactions": [],
+  "income": []
+}
