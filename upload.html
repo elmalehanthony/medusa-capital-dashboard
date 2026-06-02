@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medusa Capital — Upload</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">⚡ Medusa Capital</div>
+    <div class="nav-links">
+      <a href="index.html">Dashboard</a>
+      <a href="positions.html">Positions</a>
+      <a href="transactions.html">Transactions</a>
+      <a href="income.html">Income</a>
+      <a href="upload.html" class="active">Upload</a>
+    </div>
+  </nav>
+  <main class="container">
+    <div class="page-header">
+      <div>
+        <h1>Upload Statement</h1>
+        <p class="subtitle">Drop a BMO monthly PDF or Dashboard XLSX — Claude parses it automatically.</p>
+      </div>
+    </div>
+    <div class="card">
+      <h2>API Keys <span class="badge badge-gray">stored in your browser only — never committed to the repo</span></h2>
+      <div class="keys-grid">
+        <div class="field-group">
+          <label>Anthropic API Key</label>
+          <div class="input-row">
+            <input type="password" id="anthropic-key" placeholder="sk-ant-...">
+            <button class="btn btn-sm btn-primary" onclick="saveKey('anthropic')">Save</button>
+          </div>
+          <p class="field-hint">Get yours at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
+        </div>
+        <div class="field-group">
+          <label>GitHub Personal Access Token</label>
+          <div class="input-row">
+            <input type="password" id="github-token" placeholder="ghp_...">
+            <button class="btn btn-sm btn-primary" onclick="saveKey('github')">Save</button>
+          </div>
+          <p class="field-hint">Needs <strong>repo</strong> scope. <a href="https://github.com/settings/tokens" target="_blank">Generate token →</a></p>
+        </div>
+      </div>
+      <div id="keys-status" class="keys-status"></div>
+    </div>
+    <div class="card">
+      <h2>Drop File</h2>
+      <div class="drop-zone" id="drop-zone">
+        <div class="drop-icon">📄</div>
+        <p>Drag &amp; drop a BMO PDF or XLSX here</p>
+        <p class="drop-sub">or</p>
+        <label class="btn btn-primary" style="cursor:pointer">
+          Browse Files
+          <input type="file" id="file-input" accept=".pdf,.xlsx" style="display:none">
+        </label>
+        <p class="drop-hint">Supported: BMO monthly statement (.pdf) · Dashboard export (.xlsx)</p>
+      </div>
+    </div>
+    <div id="status-card" class="card" style="display:none">
+      <h2>Processing</h2>
+      <div id="step-read" class="step">⏳ Reading file...</div>
+      <div id="step-parse" class="step">⏳ Sending to Claude API...</div>
+      <div id="step-merge" class="step">⏳ Merging into portfolio...</div>
+      <div id="step-save" class="step">⏳ Saving to GitHub...</div>
+    </div>
+    <div id="preview-card" class="card" style="display:none">
+      <h2>Extracted Data — Review Before Saving</h2>
+      <div id="preview-content"></div>
+      <div class="preview-actions">
+        <button class="btn btn-primary" id="btn-save">Save to Repo</button>
+        <button class="btn btn-secondary" id="btn-discard">Discard</button>
+      </div>
+    </div>
+  </main>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/parser.js"></script>
+  <script src="js/github.js"></script>
+  <script src="js/charts.js"></script>
+  <script>
+    let parsedData = null, mergedData = null;
+    window.addEventListener('load', () => {
+      const ak = Keys.getAnthropic(), gk = Keys.getGithub();
+      if (ak) document.getElementById('anthropic-key').value = ak;
+      if (gk) document.getElementById('github-token').value = gk;
+      updateKeysStatus();
+    });
+    function saveKey(type) {
+      if (type === 'anthropic') Keys.setAnthropic(document.getElementById('anthropic-key').value.trim());
+      else Keys.setGithub(document.getElementById('github-token').value.trim());
+      updateKeysStatus();
+    }
+    function updateKeysStatus() {
+      const hasA = !!Keys.getAnthropic(), hasG = !!Keys.getGithub();
+      document.getElementById('keys-status').innerHTML =
+        `<span class="${hasA?'ok':'missing'}">Anthropic key: ${hasA?'✅ set':'❌ missing'}</span>
+         <span class="${hasG?'ok':'missing'}">GitHub token: ${hasG?'✅ set':'❌ missing'}</span>`;
+    }
+    const dropZone = document.getElementById('drop-zone');
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault(); dropZone.classList.remove('drag-over');
+      if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    });
+    document.getElementById('file-input').addEventListener('change', e => {
+      if (e.target.files[0]) handleFile(e.target.files[0]);
+    });
+    function setStep(id, state, text) {
+      const el = document.getElementById(id);
+      const icons = { pending:'⏳', ok:'✅', error:'❌', active:'🔄' };
+      el.textContent = (icons[state]||'⏳') + ' ' + text;
+      el.className = 'step step-' + state;
+    }
+    async function handleFile(file) {
+      parsedData = null; mergedData = null;
+      document.getElementById('status-card').style.display = 'block';
+      document.getElementById('preview-card').style.display = 'none';
+      ['step-read','step-parse','step-merge','step-save'].forEach(id =>
+        setStep(id,'pending',id.replace('step-','').replace('-',' ')+'...'));
+      try {
+        setStep('step-read','active',`Reading ${file.name} (${(file.size/1024).toFixed(0)} KB)...`);
+        await new Promise(r=>setTimeout(r,50));
+        setStep('step-read','ok',`Ready: ${file.name}`);
+        setStep('step-parse','active','Sending to Claude API...');
+        parsedData = await Parser.parseFile(file);
+        setStep('step-parse','ok',
+          `Extracted: ${parsedData.positions?.length||0} positions, `+
+          `${parsedData.transactions?.length||0} transactions, `+
+          `${parsedData.income?.length||0} income items`);
+        setStep('step-merge','active','Merging into portfolio...');
+        mergedData = await Data.merge(parsedData);
+        setStep('step-merge','ok','Merged — review below before saving');
+        setStep('step-save','pending','Waiting for your confirmation...');
+        showPreview(parsedData);
+      } catch(e) {
+        const active = ['step-read','step-parse','step-merge']
+          .find(s=>document.getElementById(s).className.includes('active')) || 'step-read';
+        setStep(active,'error','Error: ' + e.message);
+        console.error(e);
+      }
+    }
+    function showPreview(data) {
+      const s = data.snapshot;
+      document.getElementById('preview-content').innerHTML = `
+        <div class="preview-grid">
+          <div class="preview-section">
+            <h3>Snapshot — ${s?.date||'?'}</h3>
+            <table class="mini-table">
+              <tr><td>Total (CAD)</td><td>${s?formatCAD(s.total_cad):'—'}</td></tr>
+              <tr><td>FX Rate</td><td>${s?.fx_rate||'—'}</td></tr>
+              <tr><td>Market Change YTD</td><td class="${(s?.market_change_ytd||0)>=0?'positive':'negative'}">${s?formatCAD(s.market_change_ytd):'—'}</td></tr>
+              <tr><td>Net Invested (Inception)</td><td>${s?formatCAD(s.net_invested_inception):'—'}</td></tr>
+            </table>
+          </div>
+          <div class="preview-section">
+            <h3>Positions (${data.positions?.length||0})</h3>
+            <p style="color:var(--text-muted);font-size:12px;line-height:2">
+              ${data.positions?.slice(0,8).map(p=>`<span class="ticker-badge ${p.currency}">${p.ticker}</span>`).join(' ')||'None'}
+              ${(data.positions?.length||0)>8?' ...':''}
+            </p>
+          </div>
+          <div class="preview-section">
+            <h3>Transactions (${data.transactions?.length||0})</h3>
+            <p style="color:var(--text-muted);font-size:12px">
+              ${data.transactions?.slice(0,4).map(t=>`${t.date} <strong>${t.type}</strong> ${t.ticker||''}`).join('<br>')||'None'}
+            </p>
+          </div>
+          <div class="preview-section">
+            <h3>Income (${data.income?.length||0})</h3>
+            <p style="color:var(--text-muted);font-size:12px">
+              ${data.income?.slice(0,4).map(i=>`${i.date} ${i.ticker} <strong>${i.currency==='CAD'?formatCAD(i.amount):formatUSD(i.amount)}</strong>`).join('<br>')||'None'}
+            </p>
+          </div>
+        </div>
+        <details style="margin-top:16px">
+          <summary>View raw JSON</summary>
+          <pre>${JSON.stringify(data,null,2)}</pre>
+        </details>`;
+      document.getElementById('preview-card').style.display = 'block';
+      document.getElementById('btn-save').onclick = saveToRepo;
+      document.getElementById('btn-discard').onclick = () => {
+        document.getElementById('preview-card').style.display = 'none';
+        Data._cache = null;
+      };
+    }
+    async function saveToRepo() {
+      if (!mergedData) return;
+      setStep('step-save','active','Committing to GitHub...');
+      try {
+        await Github.savePortfolio(mergedData);
+        setStep('step-save','ok','Saved! Dashboard will reflect changes on next load.');
+        document.getElementById('btn-save').disabled = true;
+        document.getElementById('btn-save').textContent = '✅ Saved to Repo';
+      } catch(e) {
+        setStep('step-save','error','Save failed: ' + e.message);
+      }
+    }
+  </script>
+</body>
+</html>
