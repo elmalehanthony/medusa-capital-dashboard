@@ -1,4 +1,4 @@
-// charts.js — Chart.js wrappers
+// charts.js — Chart.js wrappers, light theme
 
 const Charts = {
   _instances: {},
@@ -24,24 +24,25 @@ const Charts = {
         labels,
         datasets: [
           {
-            label: 'Portfolio Value (CAD)',
+            label: 'Portfolio Value',
             data: snapshots.map(s => s.total_cad),
-            borderColor: '#6366f1',
-            backgroundColor: 'rgba(99,102,241,0.08)',
-            borderWidth: 2,
+            borderColor: '#0075BE',
+            backgroundColor: 'rgba(0,117,190,0.07)',
+            borderWidth: 2.5,
             fill: true,
-            tension: 0.3,
-            pointRadius: 4
+            tension: 0.4,
+            pointRadius: 3,
+            pointBackgroundColor: '#0075BE',
           },
           {
             label: 'Net Invested',
             data: snapshots.map(s => s.net_invested_inception),
-            borderColor: '#10b981',
-            borderWidth: 2,
-            borderDash: [5,5],
+            borderColor: '#c0c0b8',
+            borderWidth: 1.5,
+            borderDash: [4,4],
             fill: false,
-            tension: 0.3,
-            pointRadius: 2
+            tension: 0.4,
+            pointRadius: 0,
           }
         ]
       },
@@ -49,43 +50,70 @@ const Charts = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'top', labels: { color: '#e2e2f0', boxWidth: 12 } },
+          legend: { position: 'top', labels: { color: '#555552', boxWidth: 12, font: { size: 11 } } },
           tooltip: { callbacks: { label: ctx => ' ' + formatCAD(ctx.parsed.y) } }
         },
         scales: {
-          x: { ticks: { color: '#8888aa' }, grid: { color: 'rgba(255,255,255,0.04)' } },
-          y: { ticks: { color: '#8888aa', callback: v => '$' + (v/1000).toFixed(0) + 'k' }, grid: { color: 'rgba(255,255,255,0.04)' } }
+          x: { ticks: { color: '#999994', font: { size: 10 } }, grid: { color: '#f0f0ec' } },
+          y: { ticks: { color: '#999994', font: { size: 10 }, callback: v => '$' + (v/1000).toFixed(0) + 'k' }, grid: { color: '#f0f0ec' } }
         }
       }
     });
   },
 
-  sectorAllocation(canvasId, positions) {
+  heroSparkline(canvasId, snapshots) {
     this.destroy(canvasId);
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
-    const sectorMap = {};
-    positions.forEach(p => {
-      const s = p.sector || 'Other';
-      sectorMap[s] = (sectorMap[s] || 0) + (p.current_value_cad || 0);
-    });
-    const sorted = Object.entries(sectorMap).sort((a, b) => b[1] - a[1]);
-    const COLORS = ['#6366f1','#10b981','#f59e0b','#ef4444','#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f97316','#84cc16'];
     this._instances[canvasId] = new Chart(ctx, {
-      type: 'doughnut',
+      type: 'line',
       data: {
-        labels: sorted.map(([k]) => k),
-        datasets: [{ data: sorted.map(([,v]) => v), backgroundColor: COLORS, borderWidth: 2, borderColor: '#1a1a2e' }]
+        labels: snapshots.map(s => s.date),
+        datasets: [{
+          data: snapshots.map(s => s.total_cad),
+          borderColor: 'rgba(255,255,255,0.8)',
+          backgroundColor: 'rgba(255,255,255,0.12)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 0,
+        }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'right', labels: { color: '#e2e2f0', boxWidth: 12, font: { size: 11 } } },
-          tooltip: { callbacks: { label: ctx => ' ' + ctx.label + ': ' + formatCAD(ctx.parsed) } }
-        }
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: {
+          x: { display: false },
+          y: { display: false }
+        },
+        animation: { duration: 800 }
       }
     });
+  },
+
+  sectorBars(containerId, positions) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const sectorMap = {};
+    let total = 0;
+    positions.forEach(p => {
+      const s = p.sector || 'Other';
+      const v = p.current_value_cad || 0;
+      sectorMap[s] = (sectorMap[s] || 0) + v;
+      total += v;
+    });
+    const sorted = Object.entries(sectorMap).sort((a, b) => b[1] - a[1]).slice(0, 7);
+    const COLORS = ['#0075BE','#1a8a9b','#2563eb','#7c3aed','#00875a','#b45309','#6b7280'];
+    container.innerHTML = sorted.map(([name, val], i) => {
+      const pct = total > 0 ? (val / total * 100) : 0;
+      return `<div class="alloc-row">
+        <div class="alloc-label">${name}</div>
+        <div class="alloc-bar-wrap"><div class="alloc-bar" style="width:${pct.toFixed(1)}%;background:${COLORS[i]}"></div></div>
+        <div class="alloc-pct">${pct.toFixed(1)}%</div>
+        <div class="alloc-val">${formatCAD(val)}</div>
+      </div>`;
+    }).join('');
   },
 
   performanceBar(canvasId, positions, count = 10) {
@@ -101,10 +129,10 @@ const Charts = {
       data: {
         labels: sorted.map(p => p.ticker),
         datasets: [{
-          label: 'Return since inception',
           data: sorted.map(p => +(p.return_inception * 100).toFixed(1)),
-          backgroundColor: sorted.map(p => p.return_inception >= 0 ? 'rgba(16,185,129,0.7)' : 'rgba(239,68,68,0.7)'),
-          borderRadius: 4
+          backgroundColor: sorted.map(p => p.return_inception >= 0 ? 'rgba(0,135,90,0.75)' : 'rgba(192,57,43,0.75)'),
+          borderRadius: 4,
+          borderSkipped: false,
         }]
       },
       options: {
@@ -113,19 +141,21 @@ const Charts = {
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          x: { ticks: { color: '#8888aa', callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.04)' } },
-          y: { ticks: { color: '#e2e2f0' }, grid: { display: false } }
+          x: { ticks: { color: '#999994', font: { size: 10 }, callback: v => v + '%' }, grid: { color: '#f0f0ec' } },
+          y: { ticks: { color: '#555552', font: { size: 11 } }, grid: { display: false } }
         }
       }
     });
   }
 };
 
-// ── Shared formatters ──────────────────────────────────────────────
+// ── Formatters ────────────────────────────────────────────────────
 function formatCAD(n) {
+  if (n == null) return '—';
   return new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', minimumFractionDigits: 0 }).format(n);
 }
 function formatUSD(n) {
+  if (n == null) return '—';
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(n);
 }
 function formatPct(n) {
