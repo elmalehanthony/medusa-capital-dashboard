@@ -3,17 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medusa Capital — Dashboard</title>
+  <title>Medusa Capital</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
+
   <nav class="navbar">
-    <div class="nav-brand">⚡ Medusa Capital</div>
+    <div class="nav-brand">
+      <div class="nav-logo">
+        <svg viewBox="0 0 16 16"><path d="M8 1.5L1.5 6v9h4v-5h5v5h4V6L8 1.5z"/></svg>
+      </div>
+      <div class="nav-brand-text">
+        <div class="nav-brand-name">Medusa Capital</div>
+        <div class="nav-brand-sub">#230-32415</div>
+      </div>
+    </div>
     <div class="nav-links">
-      <a href="index.html" class="active">Dashboard</a>
-      <a href="positions.html">Positions</a>
-      <a href="transactions.html">Transactions</a>
+      <a href="index.html" class="active">Overview</a>
+      <a href="positions.html">Holdings</a>
+      <a href="transactions.html">Activity</a>
       <a href="income.html">Income</a>
       <a href="upload.html">Upload</a>
     </div>
@@ -22,31 +31,30 @@
     </button>
   </nav>
   <div class="nav-drawer" id="nav-drawer">
-    <a href="index.html" class="active">Dashboard</a>
-    <a href="positions.html">Positions</a>
-    <a href="transactions.html">Transactions</a>
+    <a href="index.html" class="active">Overview</a>
+    <a href="positions.html">Holdings</a>
+    <a href="transactions.html">Activity</a>
     <a href="income.html">Income</a>
     <a href="upload.html">Upload</a>
   </div>
 
-  <main class="container">
-    <div class="page-header">
-      <div>
-        <h1>Portfolio Dashboard</h1>
-        <p class="subtitle" id="last-updated">Loading...</p>
-      </div>
-      <a href="upload.html" class="btn btn-primary">+ Upload</a>
+  <!-- HERO -->
+  <div class="hero" id="hero">
+    <div class="hero-eyebrow">Total portfolio value</div>
+    <div class="hero-value" id="hero-value">Loading…</div>
+    <div class="hero-pills" id="hero-pills"></div>
+    <div class="hero-chart">
+      <canvas id="chart-sparkline"></canvas>
     </div>
+  </div>
 
-    <div class="kpi-grid">
+  <main class="container">
+
+    <!-- KPIs -->
+    <div class="kpi-grid" style="margin-top:4px">
       <div class="kpi-card">
-        <div class="kpi-label">Total Value (CAD)</div>
-        <div class="kpi-value" id="kpi-total">—</div>
-        <div class="kpi-sub" id="kpi-total-sub"></div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Gain Since Inception</div>
-        <div class="kpi-value" id="kpi-gain">—</div>
+        <div class="kpi-label">Gain (Inception)</div>
+        <div class="kpi-value positive" id="kpi-gain">—</div>
         <div class="kpi-sub" id="kpi-gain-sub"></div>
       </div>
       <div class="kpi-card">
@@ -60,44 +68,94 @@
         <div class="kpi-sub">Since Mar 2020</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">USD / CAD</div>
-        <div class="kpi-value" id="kpi-fx">—</div>
+        <div class="kpi-label">CAD Holdings</div>
+        <div class="kpi-value" id="kpi-cad">—</div>
+        <div class="kpi-sub">Canadian positions</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">USD Holdings</div>
+        <div class="kpi-value" id="kpi-usd">—</div>
         <div class="kpi-sub" id="kpi-fx-sub"></div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label"># Positions</div>
+        <div class="kpi-label">Positions</div>
         <div class="kpi-value" id="kpi-pos">—</div>
         <div class="kpi-sub" id="kpi-pos-sub"></div>
       </div>
     </div>
 
-    <div class="charts-grid">
-      <div class="card span-2">
-        <h2>Portfolio Value History</h2>
-        <div class="chart-container" style="height:260px">
-          <canvas id="chart-history"></canvas>
-        </div>
-      </div>
-      <div class="card">
-        <h2>Sector Allocation</h2>
-        <div class="chart-container" style="height:260px">
-          <canvas id="chart-sectors"></canvas>
-        </div>
-      </div>
-      <div class="card span-2">
-        <h2>Top Performers (Inception)</h2>
-        <div class="chart-container" style="height:240px">
-          <canvas id="chart-performers"></canvas>
-        </div>
+    <!-- Top Holdings -->
+    <div class="section-header">
+      <div class="section-title">Top Holdings</div>
+      <a href="positions.html" class="section-link">See all →</a>
+    </div>
+    <div class="holding-list" id="top-holdings">
+      <div class="card" style="text-align:center;color:var(--text-muted);padding:24px">Loading…</div>
+    </div>
+
+    <!-- Sector Allocation -->
+    <div class="section-header">
+      <div class="section-title">Sector Allocation</div>
+    </div>
+    <div class="card">
+      <div class="alloc-list" id="sector-alloc">
+        <div style="color:var(--text-muted);font-size:13px">Loading…</div>
       </div>
     </div>
+
+    <!-- Portfolio History Chart -->
+    <div class="section-header">
+      <div class="section-title">Portfolio History</div>
+    </div>
+    <div class="card">
+      <div class="chart-container" style="height:260px">
+        <canvas id="chart-history"></canvas>
+      </div>
+    </div>
+
+    <!-- Top Performers -->
+    <div class="section-header">
+      <div class="section-title">Top Performers</div>
+      <span style="font-size:11px;color:var(--text-muted)">Return since inception</span>
+    </div>
+    <div class="card">
+      <div class="chart-container" style="height:280px">
+        <canvas id="chart-performers"></canvas>
+      </div>
+    </div>
+
   </main>
+
+  <!-- Bottom nav (mobile) -->
+  <nav class="bottom-nav">
+    <div class="bnav-items">
+      <a href="index.html" class="bnav-item active">
+        <div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1h-4v-4H8v4H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+        Overview
+      </a>
+      <a href="positions.html" class="bnav-item">
+        <div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        Holdings
+      </a>
+      <a href="transactions.html" class="bnav-item">
+        <div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 13l4-4 3 3 4-5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        Activity
+      </a>
+      <a href="income.html" class="bnav-item">
+        <div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v6M8 9h3a1 1 0 010 2H9a1 1 0 000 2h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        Income
+      </a>
+      <a href="upload.html" class="bnav-item">
+        <div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M10 13V7m0 0L7 10m3-3l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 14v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        Upload
+      </a>
+    </div>
+  </nav>
 
   <script src="js/config.js"></script>
   <script src="js/data.js"></script>
   <script src="js/charts.js"></script>
   <script>
-    // Hamburger
     document.getElementById('hamburger').addEventListener('click', () => {
       document.getElementById('nav-drawer').classList.toggle('open');
     });
@@ -107,36 +165,79 @@
         const [snap, history, positions] = await Promise.all([
           Data.latestSnapshot(), Data.snapshotHistory(), Data.positions()
         ]);
+
         if (!snap) {
-          document.getElementById('last-updated').textContent = 'No data — upload a statement to get started.';
+          document.getElementById('hero-value').textContent = 'No data yet';
+          document.getElementById('top-holdings').innerHTML = '<div class="card" style="text-align:center;color:var(--text-muted);padding:32px">Upload a BMO statement to get started.</div>';
           return;
         }
-        document.getElementById('last-updated').textContent =
-          'Updated: ' + formatDate(snap.date) + ' · #230-32415';
-        document.getElementById('kpi-total').textContent = formatCAD(snap.total_cad);
-        document.getElementById('kpi-total-sub').textContent =
-          snap.cad_holdings ? 'CAD ' + formatCAD(snap.cad_holdings) + ' + USD ' + formatUSD(snap.usd_holdings_usd) : '';
+
+        // Hero
+        document.getElementById('hero-value').textContent = formatCAD(snap.total_cad);
+        const pills = [];
+        if (snap.market_change_inception != null) {
+          const pct = snap.net_invested_inception ? snap.market_change_inception / snap.net_invested_inception : 0;
+          pills.push(`<span class="hero-pill ${snap.market_change_inception >= 0 ? 'pos' : 'neg'}">${formatCAD(snap.market_change_inception)} (${formatPct(pct)}) inception</span>`);
+        }
+        if (snap.market_change_ytd != null) {
+          pills.push(`<span class="hero-pill ${snap.market_change_ytd >= 0 ? 'pos' : 'neg'}">${snap.market_change_ytd >= 0 ? '+' : ''}${formatCAD(snap.market_change_ytd)} YTD</span>`);
+        }
+        if (snap.fx_rate) pills.push(`<span class="hero-pill neutral">1 USD = ${snap.fx_rate.toFixed(4)} CAD</span>`);
+        document.getElementById('hero-pills').innerHTML = pills.join('');
+
+        // Sparkline
+        Charts.heroSparkline('chart-sparkline', history);
+
+        // KPIs
         const gain = snap.market_change_inception;
         const gainPct = snap.net_invested_inception ? gain / snap.net_invested_inception : null;
         document.getElementById('kpi-gain').textContent = gain != null ? formatCAD(gain) : '—';
-        document.getElementById('kpi-gain').className = 'kpi-value ' + (gain >= 0 ? 'positive' : 'negative');
+        document.getElementById('kpi-gain').className = 'kpi-value ' + ((gain || 0) >= 0 ? 'positive' : 'negative');
         document.getElementById('kpi-gain-sub').textContent = gainPct != null ? formatPct(gainPct) + ' on capital' : '';
         document.getElementById('kpi-ytd').textContent = snap.market_change_ytd != null ? formatCAD(snap.market_change_ytd) : '—';
         document.getElementById('kpi-ytd').className = 'kpi-value ' + ((snap.market_change_ytd || 0) >= 0 ? 'positive' : 'negative');
         document.getElementById('kpi-invested').textContent = snap.net_invested_inception != null ? formatCAD(snap.net_invested_inception) : '—';
-        document.getElementById('kpi-fx').textContent = snap.fx_rate ? snap.fx_rate.toFixed(4) : '—';
-        document.getElementById('kpi-fx-sub').textContent = snap.fx_rate ? '1 USD = ' + snap.fx_rate.toFixed(4) + ' CAD' : '';
+        document.getElementById('kpi-cad').textContent = snap.cad_holdings != null ? formatCAD(snap.cad_holdings) : '—';
+        document.getElementById('kpi-usd').textContent = snap.usd_holdings_usd != null ? formatUSD(snap.usd_holdings_usd) : '—';
+        document.getElementById('kpi-fx-sub').textContent = snap.fx_rate ? 'Rate: ' + snap.fx_rate.toFixed(4) : '';
         document.getElementById('kpi-pos').textContent = positions.length || '—';
         document.getElementById('kpi-pos-sub').textContent = positions.length
           ? positions.filter(p => p.currency === 'CAD').length + ' CAD · ' + positions.filter(p => p.currency === 'USD').length + ' USD'
           : '';
+
+        // Top Holdings
+        const topHoldings = [...positions]
+          .filter(p => p.current_value_cad)
+          .sort((a, b) => b.current_value_cad - a.current_value_cad)
+          .slice(0, 6);
+        document.getElementById('top-holdings').innerHTML = topHoldings.map(p => `
+          <div class="holding-row">
+            <div class="holding-left">
+              <div class="holding-icon ${p.currency === 'CAD' ? 'cad' : ''}">${p.ticker.slice(0,4)}</div>
+              <div>
+                <div class="holding-name">${p.name}</div>
+                <div class="holding-meta">${p.shares} shares · ${p.currency} · ${p.sector || ''}</div>
+              </div>
+            </div>
+            <div class="holding-right">
+              <div class="holding-val">${formatCAD(p.current_value_cad)}</div>
+              <div class="holding-ret ${(p.return_inception || 0) >= 0 ? 'pos' : 'neg'}">
+                ${p.return_inception != null ? formatPct(p.return_inception) + ' inception' : ''}
+              </div>
+            </div>
+          </div>`).join('');
+
+        // Sector allocation bars
+        Charts.sectorBars('sector-alloc', positions);
+
+        // History chart
         Charts.portfolioHistory('chart-history', history);
-        if (positions.length) {
-          Charts.sectorAllocation('chart-sectors', positions);
-          Charts.performanceBar('chart-performers', positions);
-        }
+
+        // Performance bar
+        if (positions.length) Charts.performanceBar('chart-performers', positions);
+
       } catch(e) {
-        document.getElementById('last-updated').textContent = 'Error: ' + e.message;
+        document.getElementById('hero-value').textContent = 'Error loading data';
         console.error(e);
       }
     }
