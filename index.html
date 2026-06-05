@@ -17,16 +17,28 @@
       <a href="income.html">Income</a>
       <a href="upload.html">Upload</a>
     </div>
+    <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
+  <div class="nav-drawer" id="nav-drawer">
+    <a href="index.html" class="active">Dashboard</a>
+    <a href="positions.html">Positions</a>
+    <a href="transactions.html">Transactions</a>
+    <a href="income.html">Income</a>
+    <a href="upload.html">Upload</a>
+  </div>
+
   <main class="container">
     <div class="page-header">
       <div>
         <h1>Portfolio Dashboard</h1>
         <p class="subtitle" id="last-updated">Loading...</p>
       </div>
-      <a href="upload.html" class="btn btn-primary">+ Upload Statement</a>
+      <a href="upload.html" class="btn btn-primary">+ Upload</a>
     </div>
-    <div class="kpi-grid" style="--kpi-cols:3">
+
+    <div class="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-label">Total Value (CAD)</div>
         <div class="kpi-value" id="kpi-total">—</div>
@@ -38,17 +50,17 @@
         <div class="kpi-sub" id="kpi-gain-sub"></div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">YTD Market Change</div>
+        <div class="kpi-label">YTD Change</div>
         <div class="kpi-value" id="kpi-ytd">—</div>
         <div class="kpi-sub">Year to date</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Net Invested (Inception)</div>
+        <div class="kpi-label">Net Invested</div>
         <div class="kpi-value" id="kpi-invested">—</div>
-        <div class="kpi-sub">Since Mar 17, 2020</div>
+        <div class="kpi-sub">Since Mar 2020</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">USD / CAD Rate</div>
+        <div class="kpi-label">USD / CAD</div>
         <div class="kpi-value" id="kpi-fx">—</div>
         <div class="kpi-sub" id="kpi-fx-sub"></div>
       </div>
@@ -58,53 +70,66 @@
         <div class="kpi-sub" id="kpi-pos-sub"></div>
       </div>
     </div>
+
     <div class="charts-grid">
-      <div class="card chart-card span-2">
+      <div class="card span-2">
         <h2>Portfolio Value History</h2>
-        <div style="height:280px"><canvas id="chart-history"></canvas></div>
+        <div class="chart-container" style="height:260px">
+          <canvas id="chart-history"></canvas>
+        </div>
       </div>
-      <div class="card chart-card">
+      <div class="card">
         <h2>Sector Allocation</h2>
-        <div style="height:280px"><canvas id="chart-sectors"></canvas></div>
+        <div class="chart-container" style="height:260px">
+          <canvas id="chart-sectors"></canvas>
+        </div>
       </div>
-      <div class="card chart-card span-2">
-        <h2>Top Performers (Since Inception)</h2>
-        <div style="height:260px"><canvas id="chart-performers"></canvas></div>
+      <div class="card span-2">
+        <h2>Top Performers (Inception)</h2>
+        <div class="chart-container" style="height:240px">
+          <canvas id="chart-performers"></canvas>
+        </div>
       </div>
     </div>
   </main>
+
   <script src="js/config.js"></script>
   <script src="js/data.js"></script>
   <script src="js/charts.js"></script>
   <script>
+    // Hamburger
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('nav-drawer').classList.toggle('open');
+    });
+
     async function init() {
       try {
         const [snap, history, positions] = await Promise.all([
           Data.latestSnapshot(), Data.snapshotHistory(), Data.positions()
         ]);
         if (!snap) {
-          document.getElementById('last-updated').textContent = 'No data yet — upload a statement to get started.';
+          document.getElementById('last-updated').textContent = 'No data — upload a statement to get started.';
           return;
         }
         document.getElementById('last-updated').textContent =
-          'Last updated: ' + formatDate(snap.date) + ' · Account #230-32415';
+          'Updated: ' + formatDate(snap.date) + ' · #230-32415';
         document.getElementById('kpi-total').textContent = formatCAD(snap.total_cad);
         document.getElementById('kpi-total-sub').textContent =
-          'CAD ' + formatCAD(snap.cad_holdings) + ' + USD ' + formatUSD(snap.usd_holdings_usd);
+          snap.cad_holdings ? 'CAD ' + formatCAD(snap.cad_holdings) + ' + USD ' + formatUSD(snap.usd_holdings_usd) : '';
         const gain = snap.market_change_inception;
-        const gainPct = gain / snap.net_invested_inception;
-        document.getElementById('kpi-gain').textContent = formatCAD(gain);
+        const gainPct = snap.net_invested_inception ? gain / snap.net_invested_inception : null;
+        document.getElementById('kpi-gain').textContent = gain != null ? formatCAD(gain) : '—';
         document.getElementById('kpi-gain').className = 'kpi-value ' + (gain >= 0 ? 'positive' : 'negative');
-        document.getElementById('kpi-gain-sub').textContent = formatPct(gainPct) + ' on invested capital';
-        document.getElementById('kpi-ytd').textContent = formatCAD(snap.market_change_ytd);
-        document.getElementById('kpi-ytd').className = 'kpi-value ' + (snap.market_change_ytd >= 0 ? 'positive' : 'negative');
-        document.getElementById('kpi-invested').textContent = formatCAD(snap.net_invested_inception);
-        document.getElementById('kpi-fx').textContent = snap.fx_rate.toFixed(4);
-        document.getElementById('kpi-fx-sub').textContent = '1 USD = ' + snap.fx_rate.toFixed(4) + ' CAD';
+        document.getElementById('kpi-gain-sub').textContent = gainPct != null ? formatPct(gainPct) + ' on capital' : '';
+        document.getElementById('kpi-ytd').textContent = snap.market_change_ytd != null ? formatCAD(snap.market_change_ytd) : '—';
+        document.getElementById('kpi-ytd').className = 'kpi-value ' + ((snap.market_change_ytd || 0) >= 0 ? 'positive' : 'negative');
+        document.getElementById('kpi-invested').textContent = snap.net_invested_inception != null ? formatCAD(snap.net_invested_inception) : '—';
+        document.getElementById('kpi-fx').textContent = snap.fx_rate ? snap.fx_rate.toFixed(4) : '—';
+        document.getElementById('kpi-fx-sub').textContent = snap.fx_rate ? '1 USD = ' + snap.fx_rate.toFixed(4) + ' CAD' : '';
         document.getElementById('kpi-pos').textContent = positions.length || '—';
         document.getElementById('kpi-pos-sub').textContent = positions.length
-          ? positions.filter(p=>p.currency==='CAD').length + ' CAD · ' + positions.filter(p=>p.currency==='USD').length + ' USD'
-          : 'Upload a statement';
+          ? positions.filter(p => p.currency === 'CAD').length + ' CAD · ' + positions.filter(p => p.currency === 'USD').length + ' USD'
+          : '';
         Charts.portfolioHistory('chart-history', history);
         if (positions.length) {
           Charts.sectorAllocation('chart-sectors', positions);

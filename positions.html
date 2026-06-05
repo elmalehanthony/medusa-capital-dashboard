@@ -16,7 +16,18 @@
       <a href="income.html">Income</a>
       <a href="upload.html">Upload</a>
     </div>
+    <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
+  <div class="nav-drawer" id="nav-drawer">
+    <a href="index.html">Dashboard</a>
+    <a href="positions.html" class="active">Positions</a>
+    <a href="transactions.html">Transactions</a>
+    <a href="income.html">Income</a>
+    <a href="upload.html">Upload</a>
+  </div>
+
   <main class="container">
     <div class="page-header">
       <div>
@@ -24,14 +35,13 @@
         <p class="subtitle" id="subtitle">Loading...</p>
       </div>
       <div class="filter-bar">
-        <select id="filter-currency"><option value="all">All Currencies</option><option value="CAD">CAD</option><option value="USD">USD</option></select>
+        <select id="filter-currency"><option value="all">All</option><option value="CAD">CAD</option><option value="USD">USD</option></select>
         <select id="filter-sector"><option value="all">All Sectors</option></select>
         <select id="sort-by">
-          <option value="pf_weight">Sort: Portfolio Weight</option>
-          <option value="return_inception">Sort: Return (Inception)</option>
-          <option value="return_last_month">Sort: Return (Month)</option>
-          <option value="current_value_cad">Sort: Value (CAD)</option>
-          <option value="ticker">Sort: Ticker A–Z</option>
+          <option value="pf_weight">Weight</option>
+          <option value="return_inception">Return</option>
+          <option value="current_value_cad">Value</option>
+          <option value="ticker">Ticker</option>
         </select>
       </div>
     </div>
@@ -39,49 +49,55 @@
       <div class="table-scroll">
         <table>
           <thead><tr>
-            <th>Ticker</th><th>Name</th><th>Sector</th>
-            <th class="num">Shares</th><th class="num">Cost/Share</th><th class="num">Total Cost</th>
-            <th class="num">Price</th><th class="num">Value</th><th class="num">Value CAD</th>
-            <th class="num">Weight</th><th class="num">Return (Inception)</th><th class="num">Return (Month)</th>
+            <th>Ticker</th>
+            <th>Name</th>
+            <th>Sector</th>
+            <th class="num">Shares</th>
+            <th class="num">Cost/Sh</th>
+            <th class="num">Value</th>
+            <th class="num">CAD</th>
+            <th class="num">Weight</th>
+            <th class="num">Return</th>
           </tr></thead>
           <tbody id="tbody"></tbody>
         </table>
       </div>
     </div>
   </main>
+
   <script src="js/config.js"></script>
   <script src="js/data.js"></script>
   <script src="js/charts.js"></script>
   <script>
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('nav-drawer').classList.toggle('open');
+    });
     let all = [];
     function render(positions) {
       const tbody = document.getElementById('tbody');
       if (!positions.length) {
-        tbody.innerHTML = '<tr><td colspan="12" class="empty">No positions. Upload a statement to populate.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="empty">No positions. Upload a statement.</td></tr>';
         return;
       }
       tbody.innerHTML = positions.map(p => `
         <tr>
           <td><span class="ticker-badge ${p.currency}">${p.ticker}</span></td>
-          <td>${p.name}</td>
-          <td><span class="sector-tag">${p.sector||'—'}</span></td>
+          <td class="desc">${p.name}</td>
+          <td><span class="sector-tag">${p.sector || '—'}</span></td>
           <td class="num">${p.shares}</td>
-          <td class="num">${p.currency==='CAD'?formatCAD(p.cost_per_share):formatUSD(p.cost_per_share)}</td>
-          <td class="num">${p.currency==='CAD'?formatCAD(p.total_cost):formatUSD(p.total_cost)}</td>
-          <td class="num">${p.currency==='CAD'?formatCAD(p.current_price):formatUSD(p.current_price)}</td>
-          <td class="num">${p.currency==='CAD'?formatCAD(p.current_value):formatUSD(p.current_value)}</td>
+          <td class="num">${p.currency === 'CAD' ? formatCAD(p.cost_per_share) : formatUSD(p.cost_per_share)}</td>
+          <td class="num">${p.currency === 'CAD' ? formatCAD(p.current_value) : formatUSD(p.current_value)}</td>
           <td class="num">${formatCAD(p.current_value_cad)}</td>
-          <td class="num">${p.pf_weight!=null?(p.pf_weight*100).toFixed(1)+'%':'—'}</td>
-          <td class="num ${(p.return_inception||0)>=0?'positive':'negative'}">${formatPct(p.return_inception)}</td>
-          <td class="num ${(p.return_last_month||0)>=0?'positive':'negative'}">${formatPct(p.return_last_month)}</td>
+          <td class="num">${p.pf_weight != null ? (p.pf_weight * 100).toFixed(1) + '%' : '—'}</td>
+          <td class="num ${(p.return_inception || 0) >= 0 ? 'positive' : 'negative'}">${formatPct(p.return_inception)}</td>
         </tr>`).join('');
     }
     function applyFilters() {
       const cur = document.getElementById('filter-currency').value;
       const sec = document.getElementById('filter-sector').value;
       const sort = document.getElementById('sort-by').value;
-      let filtered = all.filter(p => cur==='all'||p.currency===cur).filter(p => sec==='all'||p.sector===sec);
-      filtered.sort((a,b) => sort==='ticker' ? a.ticker.localeCompare(b.ticker) : (b[sort]||0)-(a[sort]||0));
+      let filtered = all.filter(p => cur === 'all' || p.currency === cur).filter(p => sec === 'all' || p.sector === sec);
+      filtered.sort((a, b) => sort === 'ticker' ? a.ticker.localeCompare(b.ticker) : (b[sort] || 0) - (a[sort] || 0));
       render(filtered);
     }
     async function init() {
@@ -90,10 +106,10 @@
       document.getElementById('subtitle').textContent = snap
         ? all.length + ' holdings as of ' + formatDate(snap.date)
         : 'No data — upload a statement';
-      const sectors = [...new Set(all.map(p=>p.sector).filter(Boolean))].sort();
+      const sectors = [...new Set(all.map(p => p.sector).filter(Boolean))].sort();
       const sel = document.getElementById('filter-sector');
-      sectors.forEach(s => { const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); });
-      ['filter-currency','filter-sector','sort-by'].forEach(id =>
+      sectors.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; sel.appendChild(o); });
+      ['filter-currency', 'filter-sector', 'sort-by'].forEach(id =>
         document.getElementById(id).addEventListener('change', applyFilters));
       applyFilters();
     }
