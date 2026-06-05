@@ -3,27 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medusa Capital — Transactions</title>
+  <title>Medusa Capital — Activity</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <nav class="navbar">
-    <div class="nav-brand">⚡ Medusa Capital</div>
+    <div class="nav-brand">
+      <div class="nav-logo"><svg viewBox="0 0 16 16" fill="#fff"><path d="M8 1.5L1.5 6v9h4v-5h5v5h4V6L8 1.5z"/></svg></div>
+      <div class="nav-brand-text">
+        <div class="nav-brand-name">Medusa Capital</div>
+        <div class="nav-brand-sub">#230-32415</div>
+      </div>
+    </div>
     <div class="nav-links">
-      <a href="index.html">Dashboard</a>
-      <a href="positions.html">Positions</a>
-      <a href="transactions.html" class="active">Transactions</a>
+      <a href="index.html">Overview</a>
+      <a href="positions.html">Holdings</a>
+      <a href="transactions.html" class="active">Activity</a>
       <a href="income.html">Income</a>
       <a href="upload.html">Upload</a>
     </div>
-    <button class="nav-hamburger" id="hamburger" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
+    <button class="nav-hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   </nav>
   <div class="nav-drawer" id="nav-drawer">
-    <a href="index.html">Dashboard</a>
-    <a href="positions.html">Positions</a>
-    <a href="transactions.html" class="active">Transactions</a>
+    <a href="index.html">Overview</a>
+    <a href="positions.html">Holdings</a>
+    <a href="transactions.html" class="active">Activity</a>
     <a href="income.html">Income</a>
     <a href="upload.html">Upload</a>
   </div>
@@ -31,26 +35,40 @@
   <main class="container">
     <div class="page-header">
       <div>
-        <h1>Transactions</h1>
-        <p class="subtitle" id="subtitle">Loading...</p>
+        <h1>Activity</h1>
+        <p class="subtitle" id="subtitle">Loading…</p>
       </div>
       <div class="filter-bar">
         <select id="filter-type">
           <option value="all">All Types</option>
-          <option value="buy">Buy</option><option value="sell">Sell</option>
-          <option value="deposit">Deposit</option><option value="withdrawal">Withdrawal</option>
-          <option value="dividend">Dividend</option><option value="fx">FX</option><option value="fee">Fee</option>
+          <option value="buy">Buy</option>
+          <option value="sell">Sell</option>
+          <option value="deposit">Deposit</option>
+          <option value="withdrawal">Withdrawal</option>
+          <option value="dividend">Dividend</option>
+          <option value="fx">FX</option>
+          <option value="fee">Fee</option>
         </select>
-        <select id="filter-currency"><option value="all">All</option><option value="CAD">CAD</option><option value="USD">USD</option></select>
+        <select id="filter-currency">
+          <option value="all">All</option>
+          <option value="CAD">CAD</option>
+          <option value="USD">USD</option>
+        </select>
       </div>
     </div>
+
     <div class="card">
       <div class="table-scroll">
         <table>
           <thead><tr>
-            <th>Date</th><th>Type</th><th>Ticker</th><th>Description</th>
-            <th class="num">Qty</th><th class="num">Price</th>
-            <th class="num">Amount</th><th>Cur</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Ticker</th>
+            <th>Description</th>
+            <th class="num">Qty</th>
+            <th class="num">Price</th>
+            <th class="num">Amount</th>
+            <th>Cur</th>
           </tr></thead>
           <tbody id="tbody"></tbody>
         </table>
@@ -58,39 +76,53 @@
     </div>
   </main>
 
+  <nav class="bottom-nav">
+    <div class="bnav-items">
+      <a href="index.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1h-4v-4H8v4H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>Overview</a>
+      <a href="positions.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Holdings</a>
+      <a href="transactions.html" class="bnav-item active"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 13l4-4 3 3 4-5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Activity</a>
+      <a href="income.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v6M8 9h3a1 1 0 010 2H9a1 1 0 000 2h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Income</a>
+      <a href="upload.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M10 13V7m0 0L7 10m3-3l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 14v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Upload</a>
+    </div>
+  </nav>
+
   <script src="js/config.js"></script>
   <script src="js/data.js"></script>
   <script src="js/charts.js"></script>
   <script>
-    document.getElementById('hamburger').addEventListener('click', () => {
-      document.getElementById('nav-drawer').classList.toggle('open');
-    });
-    const TYPE_CLASS = { buy:'badge-blue', sell:'badge-red', deposit:'badge-green', withdrawal:'badge-orange', dividend:'badge-purple', fx:'badge-gray', fee:'badge-orange', interest:'badge-purple' };
+    document.getElementById('hamburger').addEventListener('click', () => document.getElementById('nav-drawer').classList.toggle('open'));
+    const TYPE_BADGE = { buy:'badge-blue', sell:'badge-red', deposit:'badge-green', withdrawal:'badge-orange', dividend:'badge-purple', fx:'badge-gray', fee:'badge-orange', interest:'badge-purple' };
     let all = [];
+
     function render(txns) {
       const tbody = document.getElementById('tbody');
-      if (!txns.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">No transactions yet.</td></tr>'; return; }
+      if (!txns.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty">No transactions yet. Upload a statement to populate.</td></tr>';
+        return;
+      }
       tbody.innerHTML = txns.map(t => `
         <tr>
-          <td>${formatDate(t.date)}</td>
-          <td><span class="badge ${TYPE_CLASS[t.type] || 'badge-gray'}">${t.type}</span></td>
-          <td>${t.ticker ? `<span class="ticker-badge">${t.ticker}</span>` : '—'}</td>
-          <td class="desc">${t.description}</td>
+          <td style="color:var(--text-muted);font-size:12px">${formatDate(t.date)}</td>
+          <td><span class="badge ${TYPE_BADGE[t.type] || 'badge-gray'}">${t.type}</span></td>
+          <td>${t.ticker ? `<span class="ticker-badge">${t.ticker}</span>` : '<span style="color:var(--text-hint)">—</span>'}</td>
+          <td class="desc" style="color:var(--text-secondary)">${t.description || ''}</td>
           <td class="num">${t.quantity != null ? t.quantity : '—'}</td>
           <td class="num">${t.unit_price != null ? (t.currency === 'CAD' ? formatCAD(t.unit_price) : formatUSD(t.unit_price)) : '—'}</td>
-          <td class="num ${t.amount >= 0 ? 'positive' : 'negative'}">${t.currency === 'CAD' ? formatCAD(t.amount) : formatUSD(t.amount)}</td>
+          <td class="num ${(t.amount || 0) >= 0 ? 'positive' : 'negative'}">${t.currency === 'CAD' ? formatCAD(t.amount) : formatUSD(t.amount)}</td>
           <td><span class="currency-tag ${t.currency}">${t.currency}</span></td>
         </tr>`).join('');
     }
+
     function applyFilters() {
       const type = document.getElementById('filter-type').value;
       const cur = document.getElementById('filter-currency').value;
       render(all.filter(t => type === 'all' || t.type === type).filter(t => cur === 'all' || t.currency === cur));
     }
+
     async function init() {
       all = await Data.transactions();
-      document.getElementById('subtitle').textContent = all.length + ' transactions';
-      ['filter-type', 'filter-currency'].forEach(id => document.getElementById(id).addEventListener('change', applyFilters));
+      document.getElementById('subtitle').textContent = all.length ? all.length + ' transactions' : 'No transactions yet';
+      ['filter-type','filter-currency'].forEach(id => document.getElementById(id).addEventListener('change', applyFilters));
       applyFilters();
     }
     init();

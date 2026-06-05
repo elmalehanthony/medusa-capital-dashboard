@@ -8,22 +8,26 @@
 </head>
 <body>
   <nav class="navbar">
-    <div class="nav-brand">⚡ Medusa Capital</div>
+    <div class="nav-brand">
+      <div class="nav-logo"><svg viewBox="0 0 16 16" fill="#fff"><path d="M8 1.5L1.5 6v9h4v-5h5v5h4V6L8 1.5z"/></svg></div>
+      <div class="nav-brand-text">
+        <div class="nav-brand-name">Medusa Capital</div>
+        <div class="nav-brand-sub">#230-32415</div>
+      </div>
+    </div>
     <div class="nav-links">
-      <a href="index.html">Dashboard</a>
-      <a href="positions.html">Positions</a>
-      <a href="transactions.html">Transactions</a>
+      <a href="index.html">Overview</a>
+      <a href="positions.html">Holdings</a>
+      <a href="transactions.html">Activity</a>
       <a href="income.html">Income</a>
       <a href="upload.html" class="active">Upload</a>
     </div>
-    <button class="nav-hamburger" id="hamburger" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
+    <button class="nav-hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   </nav>
   <div class="nav-drawer" id="nav-drawer">
-    <a href="index.html">Dashboard</a>
-    <a href="positions.html">Positions</a>
-    <a href="transactions.html">Transactions</a>
+    <a href="index.html">Overview</a>
+    <a href="positions.html">Holdings</a>
+    <a href="transactions.html">Activity</a>
     <a href="income.html">Income</a>
     <a href="upload.html" class="active">Upload</a>
   </div>
@@ -37,12 +41,12 @@
     </div>
 
     <div class="card">
-      <h2>API Keys <span class="badge badge-gray">browser only — never committed</span></h2>
+      <h2>API Keys <span class="badge badge-gray" style="text-transform:none;font-weight:500">Stored in your browser only — never sent to the repo</span></h2>
       <div class="keys-grid">
         <div class="field-group">
           <label>Anthropic API Key</label>
           <div class="input-row">
-            <input type="password" id="anthropic-key" placeholder="sk-ant-..." autocomplete="off">
+            <input type="password" id="anthropic-key" placeholder="sk-ant-…" autocomplete="off">
             <button class="btn btn-sm btn-primary" onclick="saveKey('anthropic')">Save</button>
           </div>
           <p class="field-hint">Get yours at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
@@ -50,7 +54,7 @@
         <div class="field-group">
           <label>GitHub Personal Access Token</label>
           <div class="input-row">
-            <input type="password" id="github-token" placeholder="ghp_..." autocomplete="off">
+            <input type="password" id="github-token" placeholder="ghp_…" autocomplete="off">
             <button class="btn btn-sm btn-primary" onclick="saveKey('github')">Save</button>
           </div>
           <p class="field-hint">Needs <strong>repo</strong> scope. <a href="https://github.com/settings/tokens" target="_blank">Generate →</a></p>
@@ -63,26 +67,26 @@
       <h2>Drop File</h2>
       <div class="drop-zone" id="drop-zone">
         <div class="drop-icon">📄</div>
-        <p>Drag &amp; drop a BMO PDF or XLSX</p>
-        <p class="drop-sub">or</p>
-        <label class="btn btn-primary" style="cursor:pointer">
+        <p style="font-size:15px;font-weight:600;color:var(--text)">Drag &amp; drop your BMO statement</p>
+        <p class="drop-sub">PDF or XLSX</p>
+        <label class="btn btn-primary" style="cursor:pointer;margin-top:8px">
           Browse Files
           <input type="file" id="file-input" accept=".pdf,.xlsx" style="display:none">
         </label>
-        <p class="drop-hint">BMO monthly statement (.pdf) · Dashboard export (.xlsx)</p>
+        <p class="drop-hint">BMO monthly PDF · Dashboard XLSX</p>
       </div>
     </div>
 
     <div id="status-card" class="card" style="display:none">
       <h2>Processing</h2>
-      <div id="step-read" class="step">⏳ Reading file...</div>
-      <div id="step-parse" class="step">⏳ Sending to Claude API...</div>
-      <div id="step-merge" class="step">⏳ Merging into portfolio...</div>
-      <div id="step-save" class="step">⏳ Saving to GitHub...</div>
+      <div id="step-read" class="step">⏳ Reading file…</div>
+      <div id="step-parse" class="step">⏳ Sending to Claude API…</div>
+      <div id="step-merge" class="step">⏳ Merging into portfolio…</div>
+      <div id="step-save" class="step">⏳ Saving to GitHub…</div>
     </div>
 
     <div id="preview-card" class="card" style="display:none">
-      <h2>Extracted Data — Review Before Saving</h2>
+      <h2>Review Before Saving</h2>
       <div id="preview-content"></div>
       <div class="preview-actions">
         <button class="btn btn-primary" id="btn-save">Save to Repo</button>
@@ -91,67 +95,83 @@
     </div>
   </main>
 
+  <nav class="bottom-nav">
+    <div class="bnav-items">
+      <a href="index.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1h-4v-4H8v4H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>Overview</a>
+      <a href="positions.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Holdings</a>
+      <a href="transactions.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 13l4-4 3 3 4-5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Activity</a>
+      <a href="income.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v6M8 9h3a1 1 0 010 2H9a1 1 0 000 2h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Income</a>
+      <a href="upload.html" class="bnav-item active"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M10 13V7m0 0L7 10m3-3l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 14v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Upload</a>
+    </div>
+  </nav>
+
   <script src="js/config.js"></script>
   <script src="js/data.js"></script>
   <script src="js/parser.js"></script>
   <script src="js/github.js"></script>
   <script src="js/charts.js"></script>
   <script>
-    document.getElementById('hamburger').addEventListener('click', () => {
-      document.getElementById('nav-drawer').classList.toggle('open');
-    });
+    document.getElementById('hamburger').addEventListener('click', () => document.getElementById('nav-drawer').classList.toggle('open'));
+
     let parsedData = null, mergedData = null;
+
     window.addEventListener('load', () => {
       const ak = Keys.getAnthropic(), gk = Keys.getGithub();
       if (ak) document.getElementById('anthropic-key').value = ak;
       if (gk) document.getElementById('github-token').value = gk;
       updateKeysStatus();
     });
+
     function saveKey(type) {
       if (type === 'anthropic') Keys.setAnthropic(document.getElementById('anthropic-key').value.trim());
       else Keys.setGithub(document.getElementById('github-token').value.trim());
       updateKeysStatus();
     }
+
     function updateKeysStatus() {
       const hasA = !!Keys.getAnthropic(), hasG = !!Keys.getGithub();
       document.getElementById('keys-status').innerHTML =
         `<span class="${hasA ? 'ok' : 'missing'}">Anthropic: ${hasA ? '✅ set' : '❌ missing'}</span>
          <span class="${hasG ? 'ok' : 'missing'}">GitHub: ${hasG ? '✅ set' : '❌ missing'}</span>`;
     }
+
     const dropZone = document.getElementById('drop-zone');
     dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
     dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
     document.getElementById('file-input').addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
     function setStep(id, state, text) {
       const el = document.getElementById(id);
-      const icons = { pending: '⏳', ok: '✅', error: '❌', active: '🔄' };
+      const icons = { pending:'⏳', ok:'✅', error:'❌', active:'🔄' };
       el.textContent = (icons[state] || '⏳') + ' ' + text;
       el.className = 'step step-' + state;
     }
+
     async function handleFile(file) {
       parsedData = null; mergedData = null;
       document.getElementById('status-card').style.display = 'block';
       document.getElementById('preview-card').style.display = 'none';
-      ['step-read','step-parse','step-merge','step-save'].forEach(id => setStep(id, 'pending', id.replace('step-','').replace('-',' ') + '...'));
+      ['step-read','step-parse','step-merge','step-save'].forEach(id => setStep(id,'pending',id.replace('step-','').replace('-',' ')+'...'));
       try {
-        setStep('step-read', 'active', `Reading ${file.name} (${(file.size/1024).toFixed(0)} KB)...`);
-        await new Promise(r => setTimeout(r, 50));
-        setStep('step-read', 'ok', `Ready: ${file.name}`);
-        setStep('step-parse', 'active', 'Sending to Claude API...');
+        setStep('step-read','active',`Reading ${file.name} (${(file.size/1024).toFixed(0)} KB)…`);
+        await new Promise(r => setTimeout(r,50));
+        setStep('step-read','ok',`Ready: ${file.name}`);
+        setStep('step-parse','active','Sending to Claude API…');
         parsedData = await Parser.parseFile(file);
-        setStep('step-parse', 'ok', `Extracted: ${parsedData.positions?.length||0} positions, ${parsedData.transactions?.length||0} transactions`);
-        setStep('step-merge', 'active', 'Merging...');
+        setStep('step-parse','ok',`Extracted: ${parsedData.positions?.length||0} positions, ${parsedData.transactions?.length||0} transactions`);
+        setStep('step-merge','active','Merging…');
         mergedData = await Data.merge(parsedData);
-        setStep('step-merge', 'ok', 'Merged — review below');
-        setStep('step-save', 'pending', 'Waiting for confirmation...');
+        setStep('step-merge','ok','Merged — review below before saving');
+        setStep('step-save','pending','Waiting for your confirmation…');
         showPreview(parsedData);
       } catch(e) {
         const active = ['step-read','step-parse','step-merge'].find(s => document.getElementById(s).className.includes('active')) || 'step-read';
-        setStep(active, 'error', 'Error: ' + e.message);
+        setStep(active,'error','Error: ' + e.message);
         console.error(e);
       }
     }
+
     function showPreview(data) {
       const s = data.snapshot;
       document.getElementById('preview-content').innerHTML = `
@@ -159,45 +179,47 @@
           <div class="preview-section">
             <h3>Snapshot — ${s?.date || '?'}</h3>
             <table class="mini-table">
-              <tr><td>Total (CAD)</td><td>${s ? formatCAD(s.total_cad) : '—'}</td></tr>
+              <tr><td>Total (CAD)</td><td><strong>${s ? formatCAD(s.total_cad) : '—'}</strong></td></tr>
               <tr><td>FX Rate</td><td>${s?.fx_rate || '—'}</td></tr>
               <tr><td>YTD Change</td><td class="${(s?.market_change_ytd||0)>=0?'positive':'negative'}">${s ? formatCAD(s.market_change_ytd) : '—'}</td></tr>
+              <tr><td>Net Invested</td><td>${s ? formatCAD(s.net_invested_inception) : '—'}</td></tr>
             </table>
           </div>
           <div class="preview-section">
             <h3>Positions (${data.positions?.length||0})</h3>
-            <p style="color:var(--text-muted);font-size:12px;line-height:2">
-              ${data.positions?.slice(0,8).map(p => `<span class="ticker-badge ${p.currency}">${p.ticker}</span>`).join(' ') || 'None'}
-              ${(data.positions?.length||0) > 8 ? ' ...' : ''}
-            </p>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">
+              ${data.positions?.slice(0,10).map(p => `<span class="ticker-badge ${p.currency}">${p.ticker}</span>`).join('') || 'None'}
+              ${(data.positions?.length||0) > 10 ? `<span style="color:var(--text-muted);font-size:11px">+${data.positions.length-10} more</span>` : ''}
+            </div>
           </div>
           <div class="preview-section">
             <h3>Transactions (${data.transactions?.length||0})</h3>
-            <p style="color:var(--text-muted);font-size:12px">${data.transactions?.slice(0,3).map(t => `${t.date} <strong>${t.type}</strong> ${t.ticker||''}`).join('<br>') || 'None'}</p>
+            <p style="color:var(--text-muted);font-size:12px;line-height:1.8">${data.transactions?.slice(0,4).map(t => `${t.date} <strong>${t.type}</strong> ${t.ticker||''}`).join('<br>') || 'None'}</p>
           </div>
           <div class="preview-section">
             <h3>Income (${data.income?.length||0})</h3>
-            <p style="color:var(--text-muted);font-size:12px">${data.income?.slice(0,3).map(i => `${i.date} ${i.ticker} <strong>${i.currency==='CAD'?formatCAD(i.amount):formatUSD(i.amount)}</strong>`).join('<br>') || 'None'}</p>
+            <p style="color:var(--text-muted);font-size:12px;line-height:1.8">${data.income?.slice(0,4).map(i => `${i.date} ${i.ticker||''} <strong>${i.currency==='CAD'?formatCAD(i.amount):formatUSD(i.amount)}</strong>`).join('<br>') || 'None'}</p>
           </div>
         </div>
         <details style="margin-top:12px">
           <summary>View raw JSON</summary>
-          <pre>${JSON.stringify(data, null, 2)}</pre>
+          <pre>${JSON.stringify(data,null,2)}</pre>
         </details>`;
       document.getElementById('preview-card').style.display = 'block';
       document.getElementById('btn-save').onclick = saveToRepo;
       document.getElementById('btn-discard').onclick = () => { document.getElementById('preview-card').style.display = 'none'; Data._cache = null; };
     }
+
     async function saveToRepo() {
       if (!mergedData) return;
-      setStep('step-save', 'active', 'Committing to GitHub...');
+      setStep('step-save','active','Committing to GitHub…');
       try {
         await Github.savePortfolio(mergedData);
-        setStep('step-save', 'ok', 'Saved! Dashboard updates on next load.');
+        setStep('step-save','ok','Saved! Dashboard will reflect changes on next load.');
         document.getElementById('btn-save').disabled = true;
         document.getElementById('btn-save').textContent = '✅ Saved';
       } catch(e) {
-        setStep('step-save', 'error', 'Save failed: ' + e.message);
+        setStep('step-save','error','Save failed: ' + e.message);
       }
     }
   </script>
