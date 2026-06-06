@@ -5,155 +5,271 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Medusa Capital — Holdings</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    .pnl-pos { color: var(--green); font-weight: 700; }
+    .pnl-neg { color: var(--red); font-weight: 700; }
+    .date-nav { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .date-nav label { font-size:12px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+    .summary-bar { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:16px; }
+    @media(min-width:640px){ .summary-bar { grid-template-columns:repeat(4,1fr); } }
+    .sum-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); padding:14px 12px; box-shadow:var(--shadow-card); }
+    .sum-label { font-size:10px; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-muted); font-weight:700; margin-bottom:5px; }
+    .sum-value { font-size:18px; font-weight:700; letter-spacing:-0.4px; }
+    .col-sort { cursor:pointer; user-select:none; }
+    .col-sort:hover { color:var(--bmo-blue); }
+    .col-sort.asc::after { content:' ▲'; font-size:8px; }
+    .col-sort.desc::after { content:' ▼'; font-size:8px; }
+    .holding-card-mobile { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); padding:14px; margin-bottom:8px; box-shadow:var(--shadow-card); }
+    .hcm-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
+    .hcm-left { display:flex; gap:10px; align-items:center; }
+    .hcm-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+    .hcm-cell { }
+    .hcm-lbl { font-size:9px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); font-weight:700; }
+    .hcm-val { font-size:13px; font-weight:600; color:var(--text); }
+  </style>
 </head>
 <body>
-  <nav class="navbar">
-    <div class="nav-brand">
-      <div class="nav-logo"><svg viewBox="0 0 16 16"><path d="M8 1.5L1.5 6v9h4v-5h5v5h4V6L8 1.5z"/></svg></div>
-      <div class="nav-brand-text">
-        <div class="nav-brand-name">Medusa Capital</div>
-        <div class="nav-brand-sub">#230-32415</div>
-      </div>
+
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="nav-logo"><svg viewBox="0 0 16 16"><path d="M8 1.5L1.5 6v9h4v-5h5v5h4V6L8 1.5z"/></svg></div>
+    <div class="nav-brand-text">
+      <div class="nav-brand-name">Medusa Capital</div>
+      <div class="nav-brand-sub">#230-32415</div>
     </div>
-    <div class="nav-links">
-      <a href="index.html">Overview</a>
-      <a href="positions.html" class="active">Holdings</a>
-      <a href="transactions.html">Activity</a>
-      <a href="income.html">Income</a>
-      <a href="upload.html">Upload</a>
-    </div>
-    <button class="nav-hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
-  </nav>
-  <div class="nav-drawer" id="nav-drawer">
+  </div>
+  <div class="nav-links">
     <a href="index.html">Overview</a>
     <a href="positions.html" class="active">Holdings</a>
+    <a href="performance.html">Performance</a>
     <a href="transactions.html">Activity</a>
     <a href="income.html">Income</a>
     <a href="upload.html">Upload</a>
   </div>
+  <button class="nav-hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="nav-drawer" id="nav-drawer">
+  <a href="index.html">Overview</a>
+  <a href="positions.html" class="active">Holdings</a>
+  <a href="performance.html">Performance</a>
+  <a href="transactions.html">Activity</a>
+  <a href="income.html">Income</a>
+  <a href="upload.html">Upload</a>
+</div>
 
-  <main class="container">
-    <div class="page-header">
-      <div>
-        <h1>Holdings</h1>
-        <p class="subtitle" id="subtitle">Loading…</p>
-      </div>
-      <div class="filter-bar">
-        <select id="filter-currency"><option value="all">All</option><option value="CAD">CAD</option><option value="USD">USD</option></select>
-        <select id="filter-sector"><option value="all">All Sectors</option></select>
-        <select id="sort-by">
-          <option value="current_value_cad">Sort: Value</option>
-          <option value="pf_weight">Sort: Weight</option>
-          <option value="return_inception">Sort: Return</option>
-          <option value="ticker">Sort: Ticker</option>
-        </select>
-      </div>
+<main class="container">
+  <div class="page-header">
+    <div>
+      <h1>Holdings</h1>
+      <p class="subtitle" id="subtitle">Loading…</p>
     </div>
-
-    <!-- Card view on mobile, table on desktop -->
-    <div id="holdings-cards" class="holding-list"></div>
-
-    <div class="card" style="display:none" id="holdings-table-card">
-      <div class="table-scroll">
-        <table>
-          <thead><tr>
-            <th>Ticker</th><th>Name</th><th>Sector</th>
-            <th class="num">Shares</th><th class="num">Cost/Sh</th>
-            <th class="num">Price</th><th class="num">Value</th>
-            <th class="num">CAD</th><th class="num">Weight</th>
-            <th class="num">Return</th>
-          </tr></thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
+    <div class="date-nav">
+      <label>Snapshot</label>
+      <select id="date-select" style="font-weight:700"></select>
     </div>
-  </main>
+  </div>
 
-  <nav class="bottom-nav">
-    <div class="bnav-items">
-      <a href="index.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1h-4v-4H8v4H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>Overview</a>
-      <a href="positions.html" class="bnav-item active"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Holdings</a>
-      <a href="transactions.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 13l4-4 3 3 4-5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Activity</a>
-      <a href="income.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v6M8 9h3a1 1 0 010 2H9a1 1 0 000 2h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Income</a>
-      <a href="upload.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M10 13V7m0 0L7 10m3-3l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 14v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Upload</a>
-    </div>
-  </nav>
+  <!-- Summary bar -->
+  <div class="summary-bar">
+    <div class="sum-card"><div class="sum-label">Market Value</div><div class="sum-value" id="sum-value">—</div></div>
+    <div class="sum-card"><div class="sum-label">Unrealized Gain</div><div class="sum-value pnl-pos" id="sum-gain">—</div></div>
+    <div class="sum-card"><div class="sum-label">CAD Holdings</div><div class="sum-value" id="sum-cad">—</div></div>
+    <div class="sum-card"><div class="sum-label">USD Holdings</div><div class="sum-value" id="sum-usd">—</div></div>
+  </div>
 
-  <script src="js/config.js"></script>
-  <script src="js/data.js"></script>
-  <script src="js/charts.js"></script>
-  <script>
-    document.getElementById('hamburger').addEventListener('click', () => document.getElementById('nav-drawer').classList.toggle('open'));
-    let all = [];
-    const isMobile = () => window.innerWidth < 768;
+  <!-- Filters -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+    <select id="filter-currency"><option value="all">All currencies</option><option value="CAD">CAD only</option><option value="USD">USD only</option></select>
+    <select id="filter-sector"><option value="all">All sectors</option></select>
+    <select id="sort-by">
+      <option value="current_value_cad">Sort: Market value</option>
+      <option value="unrealizedPct">Sort: Return %</option>
+      <option value="unrealizedGain">Sort: Gain $</option>
+      <option value="pf_weight">Sort: Weight</option>
+      <option value="ticker">Sort: Ticker A–Z</option>
+    </select>
+  </div>
 
-    function renderCards(positions) {
-      const el = document.getElementById('holdings-cards');
-      const tableCard = document.getElementById('holdings-table-card');
-      if (!positions.length) {
-        el.innerHTML = '<div class="card" style="text-align:center;color:var(--text-muted);padding:32px">No holdings found.</div>';
-        tableCard.style.display = 'none';
-        return;
-      }
-      if (isMobile()) {
-        el.style.display = 'flex';
-        tableCard.style.display = 'none';
-        el.innerHTML = positions.map(p => `
-          <div class="holding-row">
-            <div class="holding-left">
-              <div class="holding-icon ${p.currency === 'CAD' ? 'cad' : ''}">${p.ticker.slice(0,4)}</div>
-              <div style="min-width:0">
-                <div class="holding-name">${p.ticker} <span style="font-weight:400;color:var(--text-muted);font-size:11px">${p.currency}</span></div>
-                <div class="holding-meta">${p.shares} sh · ${p.sector || ''}</div>
-              </div>
-            </div>
-            <div class="holding-right">
-              <div class="holding-val">${formatCAD(p.current_value_cad)}</div>
-              <div class="holding-ret ${(p.return_inception || 0) >= 0 ? 'pos' : 'neg'}">${formatPct(p.return_inception)}</div>
-            </div>
-          </div>`).join('');
-      } else {
-        el.style.display = 'none';
-        tableCard.style.display = 'block';
-        document.getElementById('tbody').innerHTML = positions.map(p => `
+  <!-- Mobile cards -->
+  <div id="mobile-holdings"></div>
+
+  <!-- Desktop table -->
+  <div class="card" id="desktop-table" style="display:none">
+    <div class="table-scroll">
+      <table id="holdings-table">
+        <thead>
           <tr>
-            <td><span class="ticker-badge ${p.currency}">${p.ticker}</span></td>
-            <td class="desc">${p.name}</td>
-            <td><span class="sector-tag">${p.sector || '—'}</span></td>
-            <td class="num">${p.shares}</td>
-            <td class="num">${p.currency === 'CAD' ? formatCAD(p.cost_per_share) : formatUSD(p.cost_per_share)}</td>
-            <td class="num">${p.currency === 'CAD' ? formatCAD(p.current_price) : formatUSD(p.current_price)}</td>
-            <td class="num">${p.currency === 'CAD' ? formatCAD(p.current_value) : formatUSD(p.current_value)}</td>
-            <td class="num">${formatCAD(p.current_value_cad)}</td>
-            <td class="num">${p.pf_weight != null ? (p.pf_weight * 100).toFixed(1) + '%' : '—'}</td>
-            <td class="num ${(p.return_inception || 0) >= 0 ? 'positive' : 'negative'}">${formatPct(p.return_inception)}</td>
-          </tr>`).join('');
-      }
-    }
+            <th class="col-sort" data-col="ticker">Ticker</th>
+            <th>Name</th>
+            <th>Sector</th>
+            <th class="num col-sort" data-col="shares">Shares</th>
+            <th class="num col-sort" data-col="cost_per_share">Avg Cost</th>
+            <th class="num col-sort" data-col="current_price">Price</th>
+            <th class="num col-sort" data-col="current_value_cad">Value (CAD)</th>
+            <th class="num col-sort" data-col="unrealizedGain">Unreal. Gain</th>
+            <th class="num col-sort" data-col="unrealizedPct">Return %</th>
+            <th class="num col-sort" data-col="pf_weight">Weight</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
 
-    function applyFilters() {
-      const cur = document.getElementById('filter-currency').value;
-      const sec = document.getElementById('filter-sector').value;
-      const sort = document.getElementById('sort-by').value;
-      let filtered = all.filter(p => cur === 'all' || p.currency === cur).filter(p => sec === 'all' || p.sector === sec);
-      filtered.sort((a, b) => sort === 'ticker' ? a.ticker.localeCompare(b.ticker) : (b[sort] || 0) - (a[sort] || 0));
-      renderCards(filtered);
-    }
+<nav class="bottom-nav"><div class="bnav-items">
+  <a href="index.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1h-4v-4H8v4H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>Overview</a>
+  <a href="positions.html" class="bnav-item active"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Holdings</a>
+  <a href="performance.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 15l5-6 3 3 4-6 3 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Perf.</a>
+  <a href="income.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v6M8 9h3a1 1 0 010 2H9a1 1 0 000 2h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Income</a>
+  <a href="upload.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M10 13V7m0 0L7 10m3-3l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 14v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Upload</a>
+</div></nav>
 
-    async function init() {
-      all = await Data.positions();
-      const snap = await Data.latestSnapshot();
-      document.getElementById('subtitle').textContent = snap
-        ? all.length + ' holdings · ' + formatDate(snap.date)
-        : 'No data — upload a statement';
-      const sectors = [...new Set(all.map(p => p.sector).filter(Boolean))].sort();
-      const sel = document.getElementById('filter-sector');
-      sectors.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; sel.appendChild(o); });
-      ['filter-currency','filter-sector','sort-by'].forEach(id => document.getElementById(id).addEventListener('change', applyFilters));
-      window.addEventListener('resize', applyFilters);
-      applyFilters();
-    }
-    init();
-  </script>
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/charts.js"></script>
+<script>
+document.getElementById('hamburger').addEventListener('click', () =>
+  document.getElementById('nav-drawer').classList.toggle('open'));
+
+let allPositions = [], allDates = [], currentSort = { col: 'current_value_cad', dir: 'desc' };
+const isMobile = () => window.innerWidth < 768;
+
+function enrichPositions(positions, totalCAD) {
+  return Analytics.positionPnL(positions, totalCAD).map(p => ({
+    ...p,
+    unrealizedGain: p.current_value_cad - (p.total_cost || p.shares * p.cost_per_share || 0),
+    unrealizedPct: p.return_inception,
+    weight: totalCAD ? p.current_value_cad / totalCAD : null
+  }));
+}
+
+function renderSummary(positions, snap) {
+  const totalVal = positions.reduce((s, p) => s + (p.current_value_cad || 0), 0);
+  const totalGain = positions.reduce((s, p) => s + (p.unrealizedGain || 0), 0);
+  const cadVal = positions.filter(p => p.currency === 'CAD').reduce((s, p) => s + (p.current_value || 0), 0);
+  const usdVal = positions.filter(p => p.currency === 'USD').reduce((s, p) => s + (p.current_value || 0), 0);
+  document.getElementById('sum-value').textContent = formatCAD(totalVal);
+  const gainEl = document.getElementById('sum-gain');
+  gainEl.textContent = formatCAD(totalGain);
+  gainEl.className = 'sum-value ' + (totalGain >= 0 ? 'pnl-pos' : 'pnl-neg');
+  document.getElementById('sum-cad').textContent = formatCAD(cadVal);
+  document.getElementById('sum-usd').textContent = formatUSD(usdVal);
+}
+
+function renderMobile(positions) {
+  const el = document.getElementById('mobile-holdings');
+  if (!positions.length) { el.innerHTML = '<div class="card"><p class="empty">No holdings for this date.</p></div>'; return; }
+  el.innerHTML = positions.map(p => `
+    <div class="holding-card-mobile">
+      <div class="hcm-top">
+        <div class="hcm-left">
+          <div class="holding-icon ${p.currency === 'CAD' ? 'cad' : ''}" style="width:36px;height:36px;border-radius:8px;background:${p.currency==='CAD'?'var(--green-bg)':'var(--bmo-blue-light)'};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:${p.currency==='CAD'?'var(--green)':'var(--bmo-blue)'}">${p.ticker.slice(0,4)}</div>
+          <div>
+            <div style="font-weight:700;font-size:14px">${p.ticker} <span style="font-size:10px;font-weight:500;color:var(--text-muted)">${p.currency}</span></div>
+            <div style="font-size:11px;color:var(--text-muted)">${p.shares} sh · ${p.sector || '—'}</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-weight:700;font-size:14px">${formatCAD(p.current_value_cad)}</div>
+          <div style="font-size:11px" class="${(p.unrealizedPct||0) >= 0 ? 'pnl-pos' : 'pnl-neg'}">${formatPct(p.unrealizedPct)}</div>
+        </div>
+      </div>
+      <div class="hcm-grid">
+        <div class="hcm-cell"><div class="hcm-lbl">Avg cost</div><div class="hcm-val">${p.currency==='CAD'?formatCAD(p.cost_per_share):formatUSD(p.cost_per_share)}</div></div>
+        <div class="hcm-cell"><div class="hcm-lbl">Current price</div><div class="hcm-val">${p.currency==='CAD'?formatCAD(p.current_price):formatUSD(p.current_price)}</div></div>
+        <div class="hcm-cell"><div class="hcm-lbl">Unreal. gain</div><div class="hcm-val ${(p.unrealizedGain||0)>=0?'pnl-pos':'pnl-neg'}">${formatCAD(p.unrealizedGain)}</div></div>
+        <div class="hcm-cell"><div class="hcm-lbl">Weight</div><div class="hcm-val">${p.weight != null ? (p.weight*100).toFixed(1)+'%' : '—'}</div></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderDesktop(positions) {
+  const tbody = document.getElementById('tbody');
+  if (!positions.length) { tbody.innerHTML = '<tr><td colspan="10" class="empty">No holdings for this date.</td></tr>'; return; }
+  tbody.innerHTML = positions.map(p => `
+    <tr>
+      <td><span class="ticker-badge ${p.currency}">${p.ticker}</span></td>
+      <td class="desc" style="color:var(--text-secondary);max-width:160px">${p.name}</td>
+      <td><span class="sector-tag">${p.sector || '—'}</span></td>
+      <td class="num">${p.shares}</td>
+      <td class="num">${p.currency==='CAD'?formatCAD(p.cost_per_share):formatUSD(p.cost_per_share)}</td>
+      <td class="num">${p.currency==='CAD'?formatCAD(p.current_price):formatUSD(p.current_price)}</td>
+      <td class="num" style="font-weight:700">${formatCAD(p.current_value_cad)}</td>
+      <td class="num ${(p.unrealizedGain||0)>=0?'pnl-pos':'pnl-neg'}">${formatCAD(p.unrealizedGain)}</td>
+      <td class="num ${(p.unrealizedPct||0)>=0?'pnl-pos':'pnl-neg'}">${formatPct(p.unrealizedPct)}</td>
+      <td class="num">${p.weight!=null?(p.weight*100).toFixed(1)+'%':'—'}</td>
+    </tr>`).join('');
+}
+
+function applyAndRender() {
+  const cur = document.getElementById('filter-currency').value;
+  const sec = document.getElementById('filter-sector').value;
+  const sort = document.getElementById('sort-by').value;
+
+  let filtered = allPositions
+    .filter(p => cur === 'all' || p.currency === cur)
+    .filter(p => sec === 'all' || p.sector === sec);
+
+  filtered.sort((a, b) => {
+    const av = a[sort], bv = b[sort];
+    if (sort === 'ticker') return av?.localeCompare(bv);
+    return (bv || 0) - (av || 0);
+  });
+
+  const snap = { total_cad: filtered.reduce((s,p)=>s+(p.current_value_cad||0),0) };
+  renderSummary(filtered, snap);
+
+  if (isMobile()) {
+    document.getElementById('mobile-holdings').style.display = 'block';
+    document.getElementById('desktop-table').style.display = 'none';
+    renderMobile(filtered);
+  } else {
+    document.getElementById('mobile-holdings').style.display = 'none';
+    document.getElementById('desktop-table').style.display = 'block';
+    renderDesktop(filtered);
+  }
+}
+
+async function loadDate(date) {
+  const [positions, allSnaps] = await Promise.all([Data.positions(date), Data.snapshotHistory()]);
+  const snap = allSnaps.find(s => s.date === date) || allSnaps[allSnaps.length-1];
+  allPositions = enrichPositions(positions, snap?.total_cad);
+  document.getElementById('subtitle').textContent =
+    allPositions.length + ' holdings · ' + formatDate(date);
+  applyAndRender();
+}
+
+async function init() {
+  allDates = await Data.allPositionDates();
+  const latestSnap = await Data.latestSnapshot();
+  const latest = latestSnap?.date || allDates[allDates.length-1];
+
+  const sel = document.getElementById('date-select');
+  [...allDates].reverse().forEach(d => {
+    const o = document.createElement('option');
+    o.value = d;
+    o.textContent = formatDate(d);
+    if (d === latest) o.selected = true;
+    sel.appendChild(o);
+  });
+  sel.addEventListener('change', () => loadDate(sel.value));
+
+  // Sector filter
+  const allPos = await Data.positions(latest);
+  const sectors = [...new Set(allPos.map(p => p.sector).filter(Boolean))].sort();
+  const secSel = document.getElementById('filter-sector');
+  sectors.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; secSel.appendChild(o); });
+
+  ['filter-currency','filter-sector','sort-by'].forEach(id =>
+    document.getElementById(id).addEventListener('change', applyAndRender));
+  window.addEventListener('resize', applyAndRender);
+
+  await loadDate(latest);
+}
+
+init();
+</script>
 </body>
 </html>
