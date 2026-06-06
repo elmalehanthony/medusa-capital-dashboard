@@ -50,38 +50,13 @@
 </div>
 
 <main class="container">
-
   <div class="kpi-grid" style="margin-top:4px">
-    <div class="kpi-card">
-      <div class="kpi-label">Total Return</div>
-      <div class="kpi-value positive" id="kpi-return">—</div>
-      <div class="kpi-sub" id="kpi-return-sub"></div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">vs Last Month</div>
-      <div class="kpi-value" id="kpi-mom">—</div>
-      <div class="kpi-sub" id="kpi-mom-sub"></div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">YTD Change</div>
-      <div class="kpi-value" id="kpi-ytd">—</div>
-      <div class="kpi-sub">Jan 1 → today</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Net Invested</div>
-      <div class="kpi-value" id="kpi-invested">—</div>
-      <div class="kpi-sub">Since Mar 2020</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">USD Holdings</div>
-      <div class="kpi-value" id="kpi-usd">—</div>
-      <div class="kpi-sub" id="kpi-fx"></div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Positions</div>
-      <div class="kpi-value" id="kpi-pos">—</div>
-      <div class="kpi-sub" id="kpi-pos-sub"></div>
-    </div>
+    <div class="kpi-card"><div class="kpi-label">Total Return</div><div class="kpi-value positive" id="kpi-return">—</div><div class="kpi-sub" id="kpi-return-sub"></div></div>
+    <div class="kpi-card"><div class="kpi-label">vs Last Month</div><div class="kpi-value" id="kpi-mom">—</div><div class="kpi-sub" id="kpi-mom-sub"></div></div>
+    <div class="kpi-card"><div class="kpi-label">YTD Change</div><div class="kpi-value" id="kpi-ytd">—</div><div class="kpi-sub">Jan 1 → today</div></div>
+    <div class="kpi-card"><div class="kpi-label">Net Invested</div><div class="kpi-value" id="kpi-invested">—</div><div class="kpi-sub">Since Mar 2020</div></div>
+    <div class="kpi-card"><div class="kpi-label">USD Holdings</div><div class="kpi-value" id="kpi-usd">—</div><div class="kpi-sub" id="kpi-fx"></div></div>
+    <div class="kpi-card"><div class="kpi-label">Positions</div><div class="kpi-value" id="kpi-pos">—</div><div class="kpi-sub" id="kpi-pos-sub"></div></div>
   </div>
 
   <div class="section-header">
@@ -92,27 +67,21 @@
 
   <div class="section-header">
     <div class="section-title">Sector Allocation</div>
+    <a href="performance.html" class="section-link">Full analysis →</a>
   </div>
-  <div class="card">
-    <div class="alloc-list" id="sector-alloc"><p class="empty">Loading…</p></div>
-  </div>
+  <div class="card"><div class="alloc-list" id="sector-alloc"><p class="empty">Loading…</p></div></div>
 
   <div class="section-header">
     <div class="section-title">Portfolio History</div>
     <span style="font-size:11px;color:var(--t4)" id="history-range"></span>
   </div>
-  <div class="card">
-    <div style="position:relative;height:260px"><canvas id="chart-history"></canvas></div>
-  </div>
+  <div class="card"><div style="position:relative;height:260px"><canvas id="chart-history"></canvas></div></div>
 
   <div class="section-header">
     <div class="section-title">Top Performers</div>
-    <span style="font-size:11px;color:var(--t4)">Return since inception</span>
+    <a href="performance.html" class="section-link">Full report →</a>
   </div>
-  <div class="card">
-    <div style="position:relative;height:300px"><canvas id="chart-performers"></canvas></div>
-  </div>
-
+  <div class="card"><div style="position:relative;height:300px"><canvas id="chart-performers"></canvas></div></div>
 </main>
 
 <nav class="bottom-nav"><div class="bnav-items">
@@ -137,7 +106,7 @@ function showError(msg) {
   document.getElementById('top-holdings').innerHTML =
     `<div class="card" style="border-left:3px solid var(--red);border-radius:0 var(--r-lg) var(--r-lg) 0">
       <p style="color:var(--red);font-size:13px;font-weight:700;margin-bottom:6px">${msg}</p>
-      <p style="color:var(--t3);font-size:12px">Check that <code>data/portfolio.json</code> is committed, then <a href="upload.html">upload a statement</a>.</p>
+      <p style="color:var(--t3);font-size:12px">Check <code>data/portfolio.json</code> is committed, then <a href="upload.html">upload a statement</a>.</p>
     </div>`;
 }
 
@@ -148,111 +117,88 @@ async function init() {
     ]);
     if (!snap) { showError('No snapshot data found in portfolio.json'); return; }
 
-    // Hero
     document.getElementById('hero-date').textContent =
-      'Portfolio value · ' + new Date(snap.date + 'T00:00:00').toLocaleDateString('en-CA', {month:'long',day:'numeric',year:'numeric'}).toUpperCase();
-
-    const totalStr = Math.abs(snap.total_cad).toLocaleString('en-CA', {minimumFractionDigits:0,maximumFractionDigits:0});
-    document.getElementById('hero-number').textContent = totalStr;
+      'Portfolio value · ' + new Date(snap.date+'T00:00:00')
+        .toLocaleDateString('en-CA',{month:'long',day:'numeric',year:'numeric'}).toUpperCase();
+    document.getElementById('hero-number').textContent =
+      Math.abs(snap.total_cad).toLocaleString('en-CA',{minimumFractionDigits:0,maximumFractionDigits:0});
 
     if (snap.market_change_inception != null && snap.net_invested_inception) {
       const pct = snap.market_change_inception / snap.net_invested_inception;
       document.getElementById('hero-return').textContent =
-        (pct >= 0 ? '+' : '') + (pct * 100).toFixed(1) + '% · ' + formatCAD(snap.market_change_inception);
+        (pct>=0?'+':'') + (pct*100).toFixed(1)+'% · '+formatCAD(snap.market_change_inception);
       document.getElementById('hero-right').style.display = 'block';
     }
 
     const pills = [];
     if (history.length >= 2) {
-      const prev = history[history.length - 2];
+      const prev = history[history.length-2];
       const mom = snap.total_cad - prev.total_cad;
-      const momPct = prev.total_cad ? mom / prev.total_cad : 0;
-      pills.push(`<span class="hero-pill ${mom >= 0 ? 'pos' : 'neg'}">${mom >= 0 ? '+' : ''}${formatCAD(mom)} vs last month (${formatPct(momPct)})</span>`);
+      const momPct = prev.total_cad ? mom/prev.total_cad : 0;
+      pills.push(`<span class="hero-pill ${mom>=0?'pos':'neg'}">${mom>=0?'+':''}${formatCAD(mom)} vs last month (${formatPct(momPct)})</span>`);
     }
     if (snap.market_change_ytd != null)
-      pills.push(`<span class="hero-pill ${snap.market_change_ytd >= 0 ? 'pos' : 'neg'}">${snap.market_change_ytd >= 0 ? '+' : ''}${formatCAD(snap.market_change_ytd)} YTD</span>`);
+      pills.push(`<span class="hero-pill ${snap.market_change_ytd>=0?'pos':'neg'}">${snap.market_change_ytd>=0?'+':''}${formatCAD(snap.market_change_ytd)} YTD</span>`);
     if (snap.fx_rate)
       pills.push(`<span class="hero-pill neutral">USD/CAD ${snap.fx_rate.toFixed(4)}</span>`);
     document.getElementById('hero-pills').innerHTML = pills.join('');
 
     requestAnimationFrame(() => Charts.heroSparkline('chart-sparkline', history));
 
-    // KPIs
     const gain = snap.market_change_inception;
-    const gainPct = snap.net_invested_inception && gain != null ? gain / snap.net_invested_inception : null;
+    const gainPct = snap.net_invested_inception && gain!=null ? gain/snap.net_invested_inception : null;
     const kpiRet = document.getElementById('kpi-return');
-    kpiRet.textContent = gainPct != null ? formatPct(gainPct) : '—';
-    kpiRet.className = 'kpi-value ' + ((gainPct || 0) >= 0 ? 'positive' : 'negative');
-    document.getElementById('kpi-return-sub').textContent = gain != null ? formatCAD(gain) + ' gain' : '';
+    kpiRet.textContent = gainPct!=null ? formatPct(gainPct) : '—';
+    kpiRet.className = 'kpi-value '+((gainPct||0)>=0?'positive':'negative');
+    document.getElementById('kpi-return-sub').textContent = gain!=null ? formatCAD(gain)+' gain' : '';
 
     if (history.length >= 2) {
-      const prev = history[history.length - 2];
+      const prev = history[history.length-2];
       const mom = snap.total_cad - prev.total_cad;
-      const momPct = prev.total_cad ? mom / prev.total_cad : 0;
+      const momPct = prev.total_cad ? mom/prev.total_cad : 0;
       const el = document.getElementById('kpi-mom');
       el.textContent = formatCAD(mom);
-      el.className = 'kpi-value ' + (mom >= 0 ? 'positive' : 'negative');
-      document.getElementById('kpi-mom-sub').textContent = formatPct(momPct) + ' · ' +
-        new Date(prev.date + 'T00:00:00').toLocaleDateString('en-CA', {month:'short',year:'2-digit'});
+      el.className = 'kpi-value '+(mom>=0?'positive':'negative');
+      document.getElementById('kpi-mom-sub').textContent = formatPct(momPct)+' · '+
+        new Date(prev.date+'T00:00:00').toLocaleDateString('en-CA',{month:'short',year:'2-digit'});
     }
 
     const kpiYtd = document.getElementById('kpi-ytd');
-    kpiYtd.textContent = snap.market_change_ytd != null ? formatCAD(snap.market_change_ytd) : '—';
-    kpiYtd.className = 'kpi-value ' + ((snap.market_change_ytd || 0) >= 0 ? 'positive' : 'negative');
-
-    document.getElementById('kpi-invested').textContent = snap.net_invested_inception != null ? formatCAD(snap.net_invested_inception) : '—';
-    document.getElementById('kpi-usd').textContent = snap.usd_holdings_usd != null ? formatUSD(snap.usd_holdings_usd) : '—';
-    document.getElementById('kpi-fx').textContent = snap.fx_rate ? '@ ' + snap.fx_rate.toFixed(4) + ' USD/CAD' : '';
+    kpiYtd.textContent = snap.market_change_ytd!=null ? formatCAD(snap.market_change_ytd) : '—';
+    kpiYtd.className = 'kpi-value '+((snap.market_change_ytd||0)>=0?'positive':'negative');
+    document.getElementById('kpi-invested').textContent = snap.net_invested_inception!=null ? formatCAD(snap.net_invested_inception) : '—';
+    document.getElementById('kpi-usd').textContent = snap.usd_holdings_usd!=null ? formatUSD(snap.usd_holdings_usd) : '—';
+    document.getElementById('kpi-fx').textContent = snap.fx_rate ? '@ '+snap.fx_rate.toFixed(4)+' USD/CAD' : '';
     document.getElementById('kpi-pos').textContent = positions.length || '—';
     document.getElementById('kpi-pos-sub').textContent = positions.length
-      ? positions.filter(p => p.currency==='CAD').length + ' CAD · ' + positions.filter(p => p.currency==='USD').length + ' USD' : '';
+      ? positions.filter(p=>p.currency==='CAD').length+' CAD · '+positions.filter(p=>p.currency==='USD').length+' USD' : '';
 
-    // Top holdings with weight bars
     const totalCAD = snap.total_cad;
-    const topH = [...positions]
-      .filter(p => p.current_value_cad)
-      .sort((a, b) => b.current_value_cad - a.current_value_cad)
-      .slice(0, 7);
-
-    if (topH.length) {
-      document.getElementById('top-holdings').innerHTML =
-        '<div class="holding-list">' +
-        topH.map(p => {
-          const weight = totalCAD ? (p.current_value_cad / totalCAD * 100) : 0;
+    const topH = [...positions].filter(p=>p.current_value_cad).sort((a,b)=>b.current_value_cad-a.current_value_cad).slice(0,7);
+    document.getElementById('top-holdings').innerHTML = topH.length
+      ? '<div class="holding-list">'+topH.map(p => {
+          const weight = totalCAD ? (p.current_value_cad/totalCAD*100) : 0;
           const ret = p.return_inception;
           return `<div class="holding-row">
             <div class="holding-bar" style="width:${weight.toFixed(1)}%"></div>
             <div class="holding-left">
-              <div class="holding-icon ${p.currency === 'CAD' ? 'cad' : 'usd'}">${p.ticker.slice(0,4)}</div>
-              <div>
-                <div class="holding-name">${p.ticker} <span style="font-size:11px;font-weight:500;color:var(--t4)">${p.currency}</span></div>
-                <div class="holding-meta">${p.shares} sh · ${p.sector || '—'}</div>
-              </div>
+              <div class="holding-icon ${p.currency==='CAD'?'cad':'usd'}">${p.ticker.slice(0,4)}</div>
+              <div><div class="holding-name">${p.ticker} <span style="font-size:11px;font-weight:500;color:var(--t4)">${p.currency}</span></div>
+              <div class="holding-meta">${p.shares} sh · ${p.sector||'—'}</div></div>
             </div>
             <div class="holding-right">
               <div class="holding-val">${formatCAD(p.current_value_cad)}</div>
-              <div class="holding-ret ${(ret || 0) >= 0 ? 'pos' : 'neg'}">${ret != null ? formatPct(ret) + ' inception' : '—'}</div>
-            </div>
-          </div>`;
-        }).join('') + '</div>';
-    } else {
-      document.getElementById('top-holdings').innerHTML =
-        '<div class="card"><p class="empty">No positions. <a href="upload.html">Upload a statement</a>.</p></div>';
-    }
+              <div class="holding-ret ${(ret||0)>=0?'pos':'neg'}">${ret!=null?formatPct(ret)+' inception':'—'}</div>
+            </div></div>`;
+        }).join('')+'</div>'
+      : '<div class="card"><p class="empty">No positions. <a href="upload.html">Upload a statement</a>.</p></div>';
 
-    // Sector bars
     Charts.sectorBars('sector-alloc', positions);
-
-    // History chart
     document.getElementById('history-range').textContent = history.length
-      ? formatDate(history[0].date) + ' – ' + formatDate(history[history.length-1].date) : '';
+      ? formatDate(history[0].date)+' – '+formatDate(history[history.length-1].date) : '';
     Charts.portfolioHistory('chart-history', history);
     if (positions.length) Charts.performanceBar('chart-performers', positions);
-
-  } catch(e) {
-    showError(e.message);
-    console.error(e);
-  }
+  } catch(e) { showError(e.message); console.error(e); }
 }
 init();
 </script>
