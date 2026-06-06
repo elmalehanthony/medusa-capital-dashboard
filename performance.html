@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medusa Capital — Performance</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .metric-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:12px; }
+    @media(min-width:640px){ .metric-grid { grid-template-columns:repeat(4,1fr); } }
+    .metric { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); padding:16px 14px; box-shadow:var(--shadow-card); }
+    .metric-label { font-size:10px; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-muted); font-weight:700; margin-bottom:6px; }
+    .metric-value { font-size:22px; font-weight:700; letter-spacing:-0.5px; color:var(--text); line-height:1.1; }
+    .metric-value.pos { color:var(--green); }
+    .metric-value.neg { color:var(--red); }
+    .metric-sub { font-size:11px; color:var(--text-muted); margin-top:4px; }
+    .heatmap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    .heatmap table { border-collapse:separate; border-spacing:2px; font-size:11px; min-width:560px; }
+    .heatmap th { text-align:center; color:var(--text-muted); font-weight:700; font-size:10px; padding:4px 6px; text-transform:uppercase; letter-spacing:0.4px; background:none; border:none; }
+    .heatmap td { text-align:center; padding:6px 4px; border-radius:5px; font-weight:600; font-size:11px; min-width:42px; cursor:default; border:none; white-space:nowrap; }
+    .heatmap td.year { font-weight:700; color:var(--text); background:none; text-align:left; padding-right:8px; }
+    .heatmap td.empty { background:var(--bg-page); color:var(--text-hint); }
+    .annual-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); }
+    .annual-row:last-child { border-bottom:none; }
+    .annual-year { font-weight:700; font-size:14px; color:var(--text); }
+    .annual-val { font-size:13px; color:var(--text-secondary); }
+    .annual-ret { font-size:14px; font-weight:700; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="nav-logo"><svg viewBox="0 0 16 16"><path d="M8 1.5L1.5 6v9h4v-5h5v5h4V6L8 1.5z"/></svg></div>
+    <div class="nav-brand-text">
+      <div class="nav-brand-name">Medusa Capital</div>
+      <div class="nav-brand-sub">#230-32415</div>
+    </div>
+  </div>
+  <div class="nav-links">
+    <a href="index.html">Overview</a>
+    <a href="positions.html">Holdings</a>
+    <a href="performance.html" class="active">Performance</a>
+    <a href="transactions.html">Activity</a>
+    <a href="income.html">Income</a>
+    <a href="upload.html">Upload</a>
+  </div>
+  <button class="nav-hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="nav-drawer" id="nav-drawer">
+  <a href="index.html">Overview</a>
+  <a href="positions.html">Holdings</a>
+  <a href="performance.html" class="active">Performance</a>
+  <a href="transactions.html">Activity</a>
+  <a href="income.html">Income</a>
+  <a href="upload.html">Upload</a>
+</div>
+
+<main class="container">
+  <div class="page-header">
+    <div>
+      <h1>Performance Analytics</h1>
+      <p class="subtitle" id="subtitle">Loading…</p>
+    </div>
+  </div>
+
+  <!-- Risk metrics -->
+  <div class="metric-grid">
+    <div class="metric">
+      <div class="metric-label">CAGR</div>
+      <div class="metric-value pos" id="m-cagr">—</div>
+      <div class="metric-sub">Annualised return</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Annualised Vol</div>
+      <div class="metric-value" id="m-vol">—</div>
+      <div class="metric-sub">Monthly std dev × −12</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Sharpe Ratio</div>
+      <div class="metric-value" id="m-sharpe">—</div>
+      <div class="metric-sub">Return / vol (rf = 0)</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Max Drawdown</div>
+      <div class="metric-value neg" id="m-dd">—</div>
+      <div class="metric-sub">Worst peak-to-trough</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Win Rate</div>
+      <div class="metric-value" id="m-winrate">—</div>
+      <div class="metric-sub">Months with positive return</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Best Month</div>
+      <div class="metric-value pos" id="m-best">—</div>
+      <div class="metric-sub" id="m-best-date"></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Worst Month</div>
+      <div class="metric-value neg" id="m-worst">—</div>
+      <div class="metric-sub" id="m-worst-date"></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Total Return</div>
+      <div class="metric-value pos" id="m-total">—</div>
+      <div class="metric-sub" id="m-total-sub"></div>
+    </div>
+  </div>
+
+  <!-- Monthly return bars -->
+  <div class="section-header">
+    <div class="section-title">Monthly Returns</div>
+  </div>
+  <div class="card">
+    <div style="position:relative;height:200px">
+      <canvas id="chart-monthly"></canvas>
+    </div>
+  </div>
+
+  <!-- Drawdown chart -->
+  <div class="section-header">
+    <div class="section-title">Drawdown from Peak</div>
+  </div>
+  <div class="card">
+    <div style="position:relative;height:180px">
+      <canvas id="chart-drawdown"></canvas>
+    </div>
+  </div>
+
+  <!-- Monthly return heatmap -->
+  <div class="section-header">
+    <div class="section-title">Return Heatmap</div>
+    <span style="font-size:11px;color:var(--text-muted)">By month · green = positive · red = negative</span>
+  </div>
+  <div class="card">
+    <div class="heatmap" id="heatmap"></div>
+  </div>
+
+  <!-- Annual returns -->
+  <div class="section-header">
+    <div class="section-title">Annual Returns</div>
+  </div>
+  <div class="card">
+    <div id="annual-returns"></div>
+  </div>
+
+</main>
+
+<nav class="bottom-nav"><div class="bnav-items">
+  <a href="index.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1h-4v-4H8v4H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>Overview</a>
+  <a href="positions.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Holdings</a>
+  <a href="performance.html" class="bnav-item active"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 15l5-6 3 3 4-6 3 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Perf.</a>
+  <a href="income.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v6M8 9h3a1 1 0 010 2H9a1 1 0 000 2h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Income</a>
+  <a href="upload.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M10 13V7m0 0L7 10m3-3l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 14v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Upload</a>
+</div></nav>
+
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/charts.js"></script>
+<script>
+document.getElementById('hamburger').addEventListener('click', () =>
+  document.getElementById('nav-drawer').classList.toggle('open'));
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function heatColor(ret) {
+  if (ret == null) return '';
+  const abs = Math.min(Math.abs(ret) * 100, 8);
+  const intensity = Math.round(abs / 8 * 100);
+  if (ret >= 0) return `background:rgba(0,135,90,${(intensity/100*0.7+0.1).toFixed(2)});color:${intensity > 50 ? '#fff' : 'var(--green)'}`;
+  return `background:rgba(192,57,43,${(intensity/100*0.7+0.1).toFixed(2)});color:${intensity > 50 ? '#fff' : 'var(--red)'}`;
+}
+
+async function init() {
+  try {
+    const [history, snap] = await Promise.all([Data.snapshotHistory(), Data.latestSnapshot()]);
+    if (!history.length) return;
+
+    document.getElementById('subtitle').textContent =
+      history.length + ' months of data · ' + formatDate(history[0].date) + ' – ' + formatDate(history[history.length-1].date);
+
+    const cagr = Analytics.cagr(history);
+    const vol = Analytics.volatility(history);
+    const sharpe = Analytics.sharpe(history);
+    const maxDD = Analytics.maxDrawdown(history);
+    const winRate = Analytics.winRate(history);
+    const best = Analytics.bestMonth(history);
+    const worst = Analytics.worstMonth(history);
+    const monthly = Analytics.monthlyReturns(history);
+    const ddSeries = Analytics.drawdownSeries(history);
+    const heatmap = Analytics.heatmapData(history);
+    const annual = Analytics.annualReturns(history);
+
+    // Metrics
+    document.getElementById('m-cagr').textContent = cagr != null ? formatPct(cagr) : '—';
+    document.getElementById('m-cagr').className = 'metric-value ' + ((cagr||0) >= 0 ? 'pos' : 'neg');
+    document.getElementById('m-vol').textContent = vol != null ? formatPct(vol) : '—';
+    const sharpeEl = document.getElementById('m-sharpe');
+    sharpeEl.textContent = sharpe != null ? sharpe.toFixed(2) : '—';
+    sharpeEl.className = 'metric-value ' + ((sharpe||0) >= 1 ? 'pos' : (sharpe||0) >= 0 ? '' : 'neg');
+    document.getElementById('m-dd').textContent = maxDD != null ? formatPct(maxDD) : '—';
+    document.getElementById('m-winrate').textContent = winRate != null ? (winRate*100).toFixed(0) + '%' : '—';
+    if (best) {
+      document.getElementById('m-best').textContent = formatPct(best.ret);
+      document.getElementById('m-best-date').textContent = best.label;
+    }
+    if (worst) {
+      document.getElementById('m-worst').textContent = formatPct(worst.ret);
+      document.getElementById('m-worst-date').textContent = worst.label;
+    }
+    if (snap) {
+      const totalRet = snap.net_invested_inception && snap.market_change_inception != null
+        ? snap.market_change_inception / snap.net_invested_inception : null;
+      document.getElementById('m-total').textContent = totalRet != null ? formatPct(totalRet) : '—';
+      document.getElementById('m-total').className = 'metric-value ' + ((totalRet||0) >= 0 ? 'pos' : 'neg');
+      document.getElementById('m-total-sub').textContent = snap.market_change_inception != null ? formatCAD(snap.market_change_inception) + ' gain' : '';
+    }
+
+    // Charts
+    requestAnimationFrame(() => {
+      Charts.monthlyReturnBars('chart-monthly', monthly);
+      Charts.drawdownChart('chart-drawdown', ddSeries);
+    });
+
+    // Heatmap
+    const years = Object.keys(heatmap).sort();
+    let html = '<table><thead><tr><th></th>' + MONTHS.map(m => `<th>${m}</th>`).join('') + '<th>Year</th></tr></thead><tbody>';
+    for (const year of years) {
+      const ann = annual.find(a => a.year === year);
+      html += `<tr><td class="year">${year}</td>`;
+      for (let m = 1; m <= 12; m++) {
+        const r = heatmap[year][m];
+        if (r != null) {
+          html += `<td style="${heatColor(r)}" title="${MONTHS[m-1]} ${year}: ${formatPct(r)}">${(r*100).toFixed(1)}%</td>`;
+        } else {
+          html += `<td class="empty">—</td>`;
+        }
+      }
+      if (ann?.ret != null) {
+        html += `<td style="${heatColor(ann.ret)};font-weight:700">${(ann.ret*100).toFixed(1)}%</td>`;
+      } else {
+        html += '<td class="empty">—</td>';
+      }
+      html += '</tr>';
+    }
+    html += '</tbody></table>';
+    document.getElementById('heatmap').innerHTML = html;
+
+    // Annual returns
+    document.getElementById('annual-returns').innerHTML = annual.map(a => `
+      <div class="annual-row">
+        <div class="annual-year">${a.year}</div>
+        <div class="annual-val">${formatCAD(a.startVal)} → ${formatCAD(a.endVal)}</div>
+        <div class="annual-ret ${a.ret >= 0 ? 'positive' : 'negative'}">
+          ${a.ret != null ? formatPct(a.ret) : '—'}
+          <span style="font-size:11px;font-weight:400;color:var(--text-muted);margin-left:6px">${formatCAD(a.change)}</span>
+        </div>
+      </div>`).join('');
+
+  } catch(e) {
+    console.error(e);
+    document.getElementById('subtitle').textContent = 'Error: ' + e.message;
+  }
+}
+init();
+</script>
+</body>
+</html>
