@@ -6,135 +6,74 @@
   <title>Medusa Capital — Performance</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <style>
-    /* ---- period tabs ---- */
-    .period-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:20px}
-    .ptab{padding:7px 16px;border-radius:var(--r-sm);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border-strong);background:var(--card);color:var(--t2);transition:all .12s;-webkit-tap-highlight-color:transparent}
-    .ptab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
-    /* ---- metric cards ---- */
-    .metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
-    @media(min-width:640px){.metric-grid{grid-template-columns:repeat(4,1fr)}}
-    .metric{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 14px;box-shadow:var(--shadow)}
-    .metric-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--t4);font-weight:700;margin-bottom:6px}
-    .metric-value{font-size:22px;font-weight:800;letter-spacing:-.5px;color:var(--t1)}
-    .metric-value.pos{color:var(--green)}.metric-value.neg{color:var(--red)}
-    .metric-sub{font-size:11px;color:var(--t4);margin-top:4px;font-weight:500}
-    /* ---- benchmark card ---- */
-    .bench-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 18px;margin-bottom:12px;box-shadow:var(--shadow)}
-    .bench-card h2{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:16px}
-    .bench-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-    .bench-row:last-child{margin-bottom:0}
-    .bench-label{font-size:12px;font-weight:700;color:var(--t1);width:110px;flex-shrink:0}
-    .bench-bar-wrap{flex:1;height:8px;background:var(--page);border-radius:4px;overflow:hidden;position:relative}
-    .bench-bar{height:100%;border-radius:4px;transition:width .5s ease}
-    .bench-val{font-size:13px;font-weight:800;width:60px;text-align:right;flex-shrink:0}
-    .bench-val.pos{color:var(--green)}.bench-val.neg{color:var(--red)}
-    .bench-alpha{font-size:11px;font-weight:700;width:64px;text-align:right;flex-shrink:0;color:var(--t3)}
-    .bench-alpha.pos{color:var(--green)}.bench-alpha.neg{color:var(--red)}
-    /* ---- stock returns table ---- */
-    .sort-th{cursor:pointer;user-select:none;white-space:nowrap}
-    .sort-th:hover{color:var(--blue)}
-    .sort-th.asc::after{content:' ▲';font-size:8px}
-    .sort-th.desc::after{content:' ▼';font-size:8px}
-    .ret-pos{color:var(--green);font-weight:700}
-    .ret-neg{color:var(--red);font-weight:700}
-    .ret-neutral{color:var(--t3);font-weight:500}
-    /* ---- heatmap ---- */
-    .heatmap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-    .heatmap table{border-collapse:separate;border-spacing:2px;min-width:580px}
-    .heatmap th{text-align:center;color:var(--t4);font-weight:700;font-size:10px;padding:4px 3px;text-transform:uppercase;letter-spacing:.4px;background:none;border:none}
-    .heatmap td{text-align:center;padding:6px 3px;border-radius:5px;font-weight:700;font-size:11px;min-width:44px;cursor:default;border:none;white-space:nowrap}
-    .heatmap td.yr-label{font-weight:800;color:var(--t1);background:none;text-align:left;padding-right:8px;min-width:40px}
-    .heatmap td.empty{background:var(--page);color:var(--t4)}
-    /* ---- annual ---- */
-    .annual-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)}
-    .annual-row:last-child{border-bottom:none}
-  </style>
 </head>
 <body>
-
 <nav class="navbar">
   <div class="nav-brand">
-    <div class="nav-dot"></div>
-    <span class="nav-brand-name">Medusa Capital</span>
-    <span class="nav-brand-sub">#230-32415</span>
+    <div class="nav-logo"><svg viewBox="0 0 16 16"><path d="M8 1.5L1.5 6v9h4v-5h5v5h4V6L8 1.5z"/></svg></div>
+    <div><div class="nav-brand-name">Medusa Capital</div><div class="nav-brand-sub">#230-32415</div></div>
   </div>
   <div class="nav-links">
-    <a href="index.html">Overview</a>
-    <a href="positions.html">Holdings</a>
+    <a href="index.html">Overview</a><a href="positions.html">Holdings</a>
     <a href="performance.html" class="active">Performance</a>
-    <a href="transactions.html">Activity</a>
-    <a href="income.html">Income</a>
-    <a href="upload.html">Upload</a>
+    <a href="transactions.html">Activity</a><a href="income.html">Income</a><a href="upload.html">Upload</a>
   </div>
-  <button class="nav-hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <button class="nav-hamburger" id="hamburger"><span></span><span></span><span></span></button>
 </nav>
 <div class="nav-drawer" id="nav-drawer">
-  <a href="index.html">Overview</a>
-  <a href="positions.html">Holdings</a>
+  <a href="index.html">Overview</a><a href="positions.html">Holdings</a>
   <a href="performance.html" class="active">Performance</a>
-  <a href="transactions.html">Activity</a>
-  <a href="income.html">Income</a>
-  <a href="upload.html">Upload</a>
+  <a href="transactions.html">Activity</a><a href="income.html">Income</a><a href="upload.html">Upload</a>
 </div>
 
 <main class="container">
   <div class="page-header">
-    <div>
-      <h1>Performance</h1>
-      <p class="subtitle" id="subtitle">Loading…</p>
-    </div>
+    <div><h1>Performance</h1><p class="subtitle" id="subtitle">Loading…</p></div>
   </div>
 
-  <!-- ===== SECTION 1: PORTFOLIO OVERVIEW ===== -->
-  <div class="section-header" style="margin-top:0">
-    <div class="section-title">Portfolio Returns</div>
-  </div>
-  <div class="metric-grid" id="metric-grid">
-    <div class="metric"><div class="metric-label">Last Month</div><div class="metric-value" id="m-lm">—</div><div class="metric-sub" id="m-lm-sub"></div></div>
-    <div class="metric"><div class="metric-label">YTD</div><div class="metric-value" id="m-ytd">—</div><div class="metric-sub">Jan 1 → now</div></div>
-    <div class="metric"><div class="metric-label">1 Year (TTM)</div><div class="metric-value" id="m-ttm">—</div><div class="metric-sub">Trailing 12m</div></div>
-    <div class="metric"><div class="metric-label">Since Inception</div><div class="metric-value" id="m-inc">—</div><div class="metric-sub">Mar 2020 → now</div></div>
-    <div class="metric"><div class="metric-label">CAGR</div><div class="metric-value" id="m-cagr">—</div><div class="metric-sub">Annualised</div></div>
-    <div class="metric"><div class="metric-label">Volatility</div><div class="metric-value" id="m-vol">—</div><div class="metric-sub">Annualised monthly σ</div></div>
+  <!-- Risk metrics -->
+  <div class="metric-grid">
+    <div class="metric"><div class="metric-label">CAGR</div><div class="metric-value" id="m-cagr">—</div><div class="metric-sub">Annualised return</div></div>
+    <div class="metric"><div class="metric-label">Volatility</div><div class="metric-value" id="m-vol">—</div><div class="metric-sub">Annualised σ</div></div>
     <div class="metric"><div class="metric-label">Max Drawdown</div><div class="metric-value neg" id="m-dd">—</div><div class="metric-sub">Peak-to-trough</div></div>
     <div class="metric"><div class="metric-label">Win Rate</div><div class="metric-value" id="m-wr">—</div><div class="metric-sub">Months positive</div></div>
+    <div class="metric"><div class="metric-label">Last Month</div><div class="metric-value" id="m-lm">—</div><div class="metric-sub" id="m-lm-sub"></div></div>
+    <div class="metric"><div class="metric-label">TTM (1 Year)</div><div class="metric-value" id="m-ttm">—</div><div class="metric-sub">Trailing 12m</div></div>
+    <div class="metric"><div class="metric-label">YTD</div><div class="metric-value" id="m-ytd">—</div><div class="metric-sub">Jan 1 → now</div></div>
+    <div class="metric"><div class="metric-label">Since Inception</div><div class="metric-value" id="m-inc">—</div><div class="metric-sub">Mar 2020 → now</div></div>
   </div>
 
-  <!-- ===== SECTION 2: BENCHMARK COMPARISON ===== -->
+  <!-- Benchmark -->
   <div class="section-header">
     <div class="section-title">Benchmark Comparison</div>
-    <span id="bench-period-label" style="font-size:11px;color:var(--t4)"></span>
+    <span style="font-size:11px;color:var(--ink-4)" id="bench-label"></span>
   </div>
-  <div class="bench-card" id="bench-card">
-    <h2>Medusa vs Indices (CAD ETF, dividends reinvested)</h2>
-    <div id="bench-rows"><p class="empty">Loading…</p></div>
+  <div class="card" id="bench-card">
+    <div style="display:flex;gap:32px;margin-bottom:20px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink-4);font-weight:700;margin-bottom:14px">Last Month</div>
+        <div id="bench-lm"><p class="empty">No benchmark data for this snapshot</p></div>
+      </div>
+      <div style="flex:1;min-width:240px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink-4);font-weight:700;margin-bottom:14px">Trailing 12 Months</div>
+        <div id="bench-1y"></div>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--ink-4);margin-top:4px">ETF benchmarks in CAD, dividends reinvested. Data available for months with Dashboard XLSX files.</p>
   </div>
 
-  <!-- Chart: portfolio vs benchmark over time -->
-  <div class="section-header">
-    <div class="section-title">Portfolio History</div>
-    <span style="font-size:11px;color:var(--t4)" id="hist-range"></span>
-  </div>
-  <div class="card"><div style="position:relative;height:260px"><canvas id="chart-history"></canvas></div></div>
+  <!-- Monthly returns -->
+  <div class="section-header"><div class="section-title">Monthly Returns</div></div>
+  <div class="card"><div style="position:relative;height:190px"><canvas id="chart-monthly"></canvas></div></div>
 
-  <!-- Chart: monthly returns bar -->
-  <div class="section-header">
-    <div class="section-title">Monthly Returns</div>
-  </div>
-  <div class="card"><div style="position:relative;height:180px"><canvas id="chart-monthly"></canvas></div></div>
-
-  <!-- Chart: drawdown -->
-  <div class="section-header">
-    <div class="section-title">Drawdown from Peak</div>
-  </div>
+  <!-- Drawdown -->
+  <div class="section-header"><div class="section-title">Drawdown from Peak</div></div>
   <div class="card"><div style="position:relative;height:150px"><canvas id="chart-dd"></canvas></div></div>
 
-  <!-- ===== SECTION 3: PER-STOCK RETURNS ===== -->
-  <div class="section-header" style="margin-top:28px">
+  <!-- Stock returns -->
+  <div class="section-header" style="margin-top:32px">
     <div class="section-title">Individual Stock Returns</div>
   </div>
-  <!-- Period selector tabs -->
   <div class="period-tabs">
     <div class="ptab active" data-period="last_month">Last Month</div>
     <div class="ptab" data-period="last_year">TTM (1 Year)</div>
@@ -143,43 +82,36 @@
   <div class="card">
     <div class="table-scroll">
       <table id="stock-table">
-        <thead>
-          <tr>
-            <th class="sort-th" data-col="ticker">Ticker</th>
-            <th>Name</th>
-            <th>Sector</th>
-            <th class="num sort-th" data-col="current_value_cad">Value</th>
-            <th class="num sort-th" data-col="pf_weight">Weight</th>
-            <th class="num sort-th active desc" data-col="ret">Return</th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th class="sort-th" data-col="ticker">Ticker</th>
+          <th>Name</th>
+          <th>Sector</th>
+          <th class="num">Value</th>
+          <th class="num sort-th" data-col="pf_weight">Weight</th>
+          <th class="num sort-th desc" data-col="ret">Return</th>
+        </tr></thead>
         <tbody id="stock-tbody"></tbody>
       </table>
     </div>
   </div>
 
-  <!-- Return heatmap -->
-  <div class="section-header" style="margin-top:28px">
+  <!-- Heatmap -->
+  <div class="section-header" style="margin-top:32px">
     <div class="section-title">Monthly Return Heatmap</div>
-    <span style="font-size:11px;color:var(--t4)">Portfolio monthly P&amp;L</span>
+    <span style="font-size:11px;color:var(--ink-4)">Green = positive · Red = negative</span>
   </div>
   <div class="card"><div class="heatmap" id="heatmap"></div></div>
 
-  <!-- Annual returns -->
-  <div class="section-header">
-    <div class="section-title">Annual Returns</div>
-  </div>
+  <!-- Annual -->
+  <div class="section-header"><div class="section-title">Annual Returns</div></div>
   <div class="card" id="annual-card"></div>
 
-  <!-- Industry allocation -->
-  <div class="section-header" style="margin-top:28px">
+  <!-- Industry -->
+  <div class="section-header" style="margin-top:32px">
     <div class="section-title">Industry Allocation</div>
-    <span style="font-size:11px;color:var(--t4)" id="alloc-date"></span>
+    <span style="font-size:11px;color:var(--ink-4)" id="alloc-date"></span>
   </div>
-  <div class="card">
-    <div class="alloc-list" id="industry-alloc"></div>
-  </div>
-
+  <div class="card"><div class="alloc-list" id="industry-alloc"></div></div>
 </main>
 
 <nav class="bottom-nav"><div class="bnav-items">
@@ -195,279 +127,191 @@
 <script src="js/analytics.js"></script>
 <script src="js/charts.js"></script>
 <script>
-document.getElementById('hamburger').addEventListener('click', () =>
-  document.getElementById('nav-drawer').classList.toggle('open'));
+document.getElementById('hamburger').addEventListener('click',()=>document.getElementById('nav-drawer').classList.toggle('open'));
 
-const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const BENCH_COLORS = ['#0075BE','#00875A','#7c3aed','#b45309'];
-const BENCH_NAMES = {
-  medusa:     'Medusa Capital',
-  tsx60:      'TSX 60 (HXT.TO)',
-  sp500:      'S&P 500 (HXS.TO)',
-  blend_5050: '50/50 Blend',
-};
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+let currentPeriod='last_month', positions=[], sortCol='ret', sortDir='desc';
 
-let currentPeriod = 'last_month';
-let positions = [];
-let sortCol = 'ret', sortDir = 'desc';
+function retClass(v){ return v==null?'':v>=0?'positive':'negative'; }
+function retStr(v){ if(v==null)return '—'; return (v>=0?'+':'')+(v*100).toFixed(1)+'%'; }
 
-// ── helpers ──────────────────────────────────────────────────────────────
-function retClass(v) {
-  if (v == null) return 'ret-neutral';
-  return v >= 0 ? 'ret-pos' : 'ret-neg';
-}
-function retStr(v) {
-  if (v == null) return '—';
-  return (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%';
-}
-function heatColor(ret) {
-  if (ret == null) return '';
-  const abs = Math.min(Math.abs(ret) * 100, 8);
-  const intensity = abs / 8;
-  if (ret >= 0)
-    return `background:rgba(0,135,90,${(intensity*.7+.1).toFixed(2)});color:${intensity>.5?'#fff':'var(--green)'}`;
-  return `background:rgba(192,57,43,${(intensity*.7+.1).toFixed(2)});color:${intensity>.5?'#fff':'var(--red)'}`;
+function heatColor(ret){
+  if(ret==null)return '';
+  const abs=Math.min(Math.abs(ret)*100,8);
+  const i=abs/8;
+  if(ret>=0) return `background:rgba(0,168,107,${(i*.65+.1).toFixed(2)});color:${i>.5?'#fff':'#006644'}`;
+  return `background:rgba(224,49,49,${(i*.65+.1).toFixed(2)});color:${i>.5?'#fff':'#B02020'}`;
 }
 
-// ── stock table ───────────────────────────────────────────────────────────
-function renderStockTable() {
-  const tbody = document.getElementById('stock-tbody');
-  const periodKey = {
-    last_month: 'return_last_month',
-    last_year:  'return_last_year',
-    inception:  'return_inception',
-  }[currentPeriod];
-
-  const rows = positions
-    .filter(p => !['Cash - CAD','Cash - USD'].includes(p.ticker))
-    .map(p => ({ ...p, ret: p[periodKey] }))
-    .sort((a, b) => {
-      let av = a[sortCol === 'ret' ? 'ret' : sortCol];
-      let bv = b[sortCol === 'ret' ? 'ret' : sortCol];
-      if (sortCol === 'ticker') return sortDir === 'asc' ? av?.localeCompare(bv) : bv?.localeCompare(av);
-      return sortDir === 'asc' ? (av||0)-(bv||0) : (bv||0)-(av||0);
-    });
-
-  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">No data</td></tr>'; return; }
-
-  tbody.innerHTML = rows.map(p => `
-    <tr>
-      <td><span class="ticker-badge ${p.currency}">${p.ticker}</span></td>
-      <td class="desc" style="max-width:160px;color:var(--t2)">${p.name}</td>
-      <td><span class="sector-tag">${p.sector||'—'}</span></td>
-      <td class="num">${formatCAD(p.current_value_cad)}</td>
-      <td class="num">${p.pf_weight!=null?(p.pf_weight*100).toFixed(1)+'%':'—'}</td>
-      <td class="num ${retClass(p.ret)}">${retStr(p.ret)}</td>
-    </tr>`).join('');
-}
-
-// period tabs
-document.querySelectorAll('.ptab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    currentPeriod = tab.dataset.period;
-    renderStockTable();
-  });
-});
-
-// column sort
-document.querySelectorAll('.sort-th').forEach(th => {
-  th.addEventListener('click', () => {
-    const col = th.dataset.col;
-    if (sortCol === col) sortDir = sortDir === 'desc' ? 'asc' : 'desc';
-    else { sortCol = col; sortDir = 'desc'; }
-    document.querySelectorAll('.sort-th').forEach(t => t.classList.remove('asc','desc'));
-    th.classList.add(sortDir);
-    renderStockTable();
-  });
-});
-
-// ── benchmark rows ────────────────────────────────────────────────────────
-function renderBenchmark(snap) {
-  const bench = snap?.benchmarks;
-  const container = document.getElementById('bench-rows');
-  if (!bench) {
-    container.innerHTML = '<p style="color:var(--t4);font-size:13px">Benchmark data available for Oct 2024, Dec 2024, Feb/Mar/May 2025, Feb/Apr 2026 snapshots.</p>';
-    return;
-  }
-
-  // Show Last Month by default, then 1 year
-  const periods = Object.keys(bench);
-  const lm = bench['Last Month'] || bench[periods[0]];
-  const oneyr = bench['1 year'];
-
-  document.getElementById('bench-period-label').textContent =
-    snap.date ? 'as of ' + formatDate(snap.date) : '';
-
-  // Last Month comparison
-  let html = '<div style="margin-bottom:20px">';
-  html += '<div style="font-size:10px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Last Month</div>';
-  html += renderBenchBlock(lm);
-  html += '</div>';
-
-  if (oneyr) {
-    html += '<div>';
-    html += '<div style="font-size:10px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Trailing 12 Months</div>';
-    html += renderBenchBlock(oneyr);
-    html += '</div>';
-  }
-
-  container.innerHTML = html;
-}
-
-function renderBenchBlock(data) {
-  if (!data) return '';
-  const items = [
-    { key:'medusa',     label:'Medusa Capital', color:'#0075BE' },
-    { key:'tsx60',      label:'TSX 60 (HXT.TO)', color:'#00875A' },
-    { key:'sp500',      label:'S&P 500 (HXS.TO)', color:'#7c3aed' },
-    { key:'blend_5050', label:'50/50 Blend', color:'#b45309' },
-    { key:'blend_7525', label:'75/25 Blend', color:'#888' },
+function renderBenchBlock(data, containerId){
+  const el=document.getElementById(containerId); if(!el)return;
+  if(!data){el.innerHTML='<p style="color:var(--ink-4);font-size:12px">No data for this period.</p>';return;}
+  const items=[
+    {key:'medusa',label:'Medusa Capital',color:'#0066CC'},
+    {key:'tsx60', label:'TSX 60 (HXT.TO)',color:'#00A86B'},
+    {key:'sp500', label:'S&P 500 (HXS.TO)',color:'#6644DD'},
+    {key:'blend_5050',label:'50/50 Blend',color:'#C07A00'},
   ];
-
-  const vals = items.map(it => data[it.key]).filter(v => v != null);
-  const maxAbs = Math.max(...vals.map(Math.abs), 0.01);
-
-  return items.filter(it => data[it.key] != null).map(it => {
-    const v = data[it.key];
-    const barPct = Math.abs(v) / maxAbs * 100;
-    const alpha = it.key === 'medusa' && data.alpha_5050 != null ? data.alpha_5050 : null;
+  const vals=items.map(it=>data[it.key]).filter(v=>v!=null);
+  const maxAbs=Math.max(...vals.map(Math.abs),0.01);
+  el.innerHTML=items.filter(it=>data[it.key]!=null).map(it=>{
+    const v=data[it.key];
+    const pct=Math.abs(v)/maxAbs*100;
+    const alpha=it.key==='medusa'&&data.alpha_5050!=null?data.alpha_5050:null;
+    const isMediasa=it.key==='medusa';
     return `<div class="bench-row">
-      <div class="bench-label" style="display:flex;align-items:center;gap:6px">
-        <div style="width:8px;height:8px;border-radius:50%;background:${it.color};flex-shrink:0"></div>
+      <div class="bench-label">
+        <div class="bench-dot" style="background:${it.color}"></div>
         ${it.label}
       </div>
       <div class="bench-bar-wrap">
-        <div class="bench-bar" style="width:${barPct.toFixed(1)}%;background:${v>=0?it.color:'var(--red)'};
-          ${v<0?'margin-left:auto':''}"></div>
+        <div class="bench-bar" style="width:${pct.toFixed(1)}%;background:${v>=0?it.color:'var(--red)'}"></div>
       </div>
       <div class="bench-val ${v>=0?'pos':'neg'}">${retStr(v)}</div>
-      ${it.key==='medusa'&&alpha!=null?`<div class="bench-alpha ${alpha>=0?'pos':'neg'}">\u03b1 ${retStr(alpha)}</div>`:'<div class="bench-alpha"></div>'}
+      ${isMediasa&&alpha!=null
+        ?`<div class="bench-alpha ${alpha>=0?'pos':'neg'}">α ${retStr(alpha)}</div>`
+        :'<div style="width:58px"></div>'}
     </div>`;
   }).join('');
 }
 
-// ── main init ─────────────────────────────────────────────────────────────
-async function init() {
-  try {
-    const [history, snap] = await Promise.all([Data.snapshotHistory(), Data.latestSnapshot()]);
-    positions = await Data.positions();
+function renderStockTable(){
+  const tbody=document.getElementById('stock-tbody');
+  const key={last_month:'return_last_month',last_year:'return_last_year',inception:'return_inception'}[currentPeriod];
+  const rows=[...positions]
+    .filter(p=>!['Cash - CAD','Cash - USD'].includes(p.ticker))
+    .map(p=>({...p,ret:p[key]}))
+    .sort((a,b)=>{
+      let av=a[sortCol==='ret'?'ret':sortCol],bv=b[sortCol==='ret'?'ret':sortCol];
+      if(sortCol==='ticker') return sortDir==='asc'?av?.localeCompare(bv):bv?.localeCompare(av);
+      return sortDir==='asc'?(av||0)-(bv||0):(bv||0)-(av||0);
+    });
+  if(!rows.length){tbody.innerHTML='<tr><td colspan="6" class="empty">No data</td></tr>';return;}
+  tbody.innerHTML=rows.map(p=>`<tr>
+    <td><span class="ticker-badge ${p.currency}">${p.ticker}</span></td>
+    <td class="desc" style="max-width:150px">${p.name}</td>
+    <td><span class="sector-tag">${p.sector||'—'}</span></td>
+    <td class="num">${formatCAD(p.current_value_cad)}</td>
+    <td class="num">${p.pf_weight!=null?(p.pf_weight*100).toFixed(1)+'%':'—'}</td>
+    <td class="num ${retClass(p.ret)}" style="font-weight:700">${retStr(p.ret)}</td>
+  </tr>`).join('');
+}
 
-    if (!snap) return;
+document.querySelectorAll('.ptab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.ptab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active'); currentPeriod=t.dataset.period; renderStockTable();
+  });
+});
+document.querySelectorAll('.sort-th').forEach(th=>{
+  th.addEventListener('click',()=>{
+    const col=th.dataset.col;
+    if(sortCol===col) sortDir=sortDir==='desc'?'asc':'desc';
+    else{sortCol=col;sortDir='desc';}
+    document.querySelectorAll('.sort-th').forEach(t=>t.classList.remove('asc','desc'));
+    th.classList.add(sortDir); renderStockTable();
+  });
+});
 
-    document.getElementById('subtitle').textContent =
-      formatDate(history[0]?.date) + ' – ' + formatDate(snap.date) +
-      ' · ' + history.length + ' months of data';
+async function init(){
+  try{
+    const [history,snap]=await Promise.all([Data.snapshotHistory(),Data.latestSnapshot()]);
+    positions=await Data.positions();
+    if(!snap)return;
 
-    // ── Portfolio metrics ──────────────────────────────────────────────
-    const monthly = Analytics.monthlyReturns(history);
-    const cagr    = Analytics.cagr(history);
-    const vol     = Analytics.volatility(history);
-    const maxDD   = Analytics.maxDrawdown(history);
-    const wr      = Analytics.winRate(history);
+    document.getElementById('subtitle').textContent=
+      formatDate(history[0]?.date)+' – '+formatDate(snap.date)+' · '+history.length+' months';
 
-    // Last month
-    const lm = monthly[monthly.length-1];
-    const lmEl = document.getElementById('m-lm');
-    lmEl.textContent = lm ? retStr(lm.ret) : '—';
-    lmEl.className = 'metric-value ' + (lm?.ret >= 0 ? 'pos' : 'neg');
-    document.getElementById('m-lm-sub').textContent = lm ? formatDate(lm.date) : '';
+    // Metrics
+    const monthly=Analytics.monthlyReturns(history);
+    const cagr=Analytics.cagr(history);
+    const vol=Analytics.volatility(history);
+    const maxDD=Analytics.maxDrawdown(history);
+    const wr=Analytics.winRate(history);
+    const lm=monthly[monthly.length-1];
 
-    // YTD
-    const ytdVal = snap.market_change_ytd;
-    const ytdRet = snap.net_invested_inception && ytdVal != null ? null : null; // use raw pct if available
-    const ytdEl = document.getElementById('m-ytd');
-    ytdEl.textContent = ytdVal != null ? formatCAD(ytdVal) : '—';
-    ytdEl.className = 'metric-value ' + ((ytdVal||0) >= 0 ? 'pos' : 'neg');
+    document.getElementById('m-cagr').textContent=cagr!=null?retStr(cagr):'—';
+    document.getElementById('m-cagr').className='metric-value '+((cagr||0)>=0?'pos':'neg');
+    document.getElementById('m-vol').textContent=vol!=null?retStr(vol):'—';
+    document.getElementById('m-dd').textContent=maxDD!=null?retStr(maxDD):'—';
+    document.getElementById('m-wr').textContent=wr!=null?(wr*100).toFixed(0)+'%':'—';
 
-    // TTM (1 year)
-    const oneYrAgo = new Date(snap.date + 'T00:00:00');
-    oneYrAgo.setFullYear(oneYrAgo.getFullYear() - 1);
-    const snapOneYrAgo = history.filter(s => new Date(s.date+'T00:00:00') <= oneYrAgo).pop();
-    const ttmRet = snapOneYrAgo && snap.total_cad
-      ? (snap.total_cad - snapOneYrAgo.total_cad) / snapOneYrAgo.total_cad : null;
-    const ttmEl = document.getElementById('m-ttm');
-    ttmEl.textContent = ttmRet != null ? retStr(ttmRet) : '—';
-    ttmEl.className = 'metric-value ' + ((ttmRet||0) >= 0 ? 'pos' : 'neg');
+    const lmEl=document.getElementById('m-lm');
+    lmEl.textContent=lm?retStr(lm.ret):'—';
+    lmEl.className='metric-value '+((lm?.ret||0)>=0?'pos':'neg');
+    document.getElementById('m-lm-sub').textContent=lm?formatDate(lm.date):'';
 
-    // Inception
-    const incRet = snap.net_invested_inception && snap.market_change_inception != null
-      ? snap.market_change_inception / snap.net_invested_inception : null;
-    const incEl = document.getElementById('m-inc');
-    incEl.textContent = incRet != null ? retStr(incRet) : '—';
-    incEl.className = 'metric-value ' + ((incRet||0) >= 0 ? 'pos' : 'neg');
+    // TTM
+    const oneYrAgo=new Date(snap.date+'T00:00:00'); oneYrAgo.setFullYear(oneYrAgo.getFullYear()-1);
+    const snapPrev=history.filter(s=>new Date(s.date+'T00:00:00')<=oneYrAgo).pop();
+    const ttm=snapPrev&&snap.total_cad?(snap.total_cad-snapPrev.total_cad)/snapPrev.total_cad:null;
+    const ttmEl=document.getElementById('m-ttm');
+    ttmEl.textContent=ttm!=null?retStr(ttm):'—';
+    ttmEl.className='metric-value '+((ttm||0)>=0?'pos':'neg');
 
-    document.getElementById('m-cagr').textContent = cagr != null ? retStr(cagr) : '—';
-    document.getElementById('m-cagr').className = 'metric-value ' + ((cagr||0)>=0?'pos':'neg');
-    document.getElementById('m-vol').textContent  = vol  != null ? retStr(vol)  : '—';
-    document.getElementById('m-dd').textContent   = maxDD!= null ? retStr(maxDD): '—';
-    document.getElementById('m-wr').textContent   = wr   != null ? (wr*100).toFixed(0)+'%' : '—';
+    const ytdEl=document.getElementById('m-ytd');
+    ytdEl.textContent=snap.market_change_ytd!=null?formatCAD(snap.market_change_ytd):'—';
+    ytdEl.className='metric-value '+((snap.market_change_ytd||0)>=0?'pos':'neg');
 
-    // ── Benchmark ─────────────────────────────────────────────────────
-    // Find most recent snapshot with benchmark data
-    const snapWithBench = [...history].reverse().find(s => s.benchmarks);
-    renderBenchmark(snapWithBench || snap);
+    const incRet=snap.net_invested_inception&&snap.market_change_inception!=null?snap.market_change_inception/snap.net_invested_inception:null;
+    const incEl=document.getElementById('m-inc');
+    incEl.textContent=incRet!=null?retStr(incRet):'—';
+    incEl.className='metric-value '+((incRet||0)>=0?'pos':'neg');
 
-    // ── Charts ────────────────────────────────────────────────────────
-    document.getElementById('hist-range').textContent =
-      formatDate(history[0].date) + ' – ' + formatDate(snap.date);
+    // Benchmark
+    const snapWithBench=[...history].reverse().find(s=>s.benchmarks);
+    if(snapWithBench?.benchmarks){
+      document.getElementById('bench-label').textContent='as of '+formatDate(snapWithBench.date);
+      renderBenchBlock(snapWithBench.benchmarks['Last Month'],'bench-lm');
+      renderBenchBlock(snapWithBench.benchmarks['1 year'],'bench-1y');
+    } else {
+      document.getElementById('bench-lm').innerHTML='<p style="color:var(--ink-4);font-size:12px">No benchmark data found. Available for Oct/Dec 2024, Feb/Mar/May 2025, Feb/Apr 2026 snapshots.</p>';
+    }
 
-    requestAnimationFrame(() => {
-      Charts.portfolioHistory('chart-history', history);
-      Charts.monthlyReturnBars('chart-monthly', monthly);
-      Charts.drawdownChart('chart-dd', Analytics.drawdownSeries(history));
+    // Charts
+    requestAnimationFrame(()=>{
+      Charts.monthlyReturnBars('chart-monthly',monthly);
+      Charts.drawdownChart('chart-dd',Analytics.drawdownSeries(history));
     });
 
-    // ── Heatmap ───────────────────────────────────────────────────────
-    const hmap = Analytics.heatmapData(history);
-    const annual = Analytics.annualReturns(history);
-    const years = Object.keys(hmap).sort();
-    let htbl = '<table><thead><tr><th></th>';
-    MONTHS.forEach(m => htbl += `<th>${m}</th>`);
-    htbl += '<th>Year</th></tr></thead><tbody>';
-    for (const yr of years) {
-      const ann = annual.find(a => a.year === yr);
-      htbl += `<tr><td class="yr-label">${yr}</td>`;
-      for (let m = 1; m <= 12; m++) {
-        const r = hmap[yr][m];
-        htbl += r != null
-          ? `<td style="${heatColor(r)}" title="${MONTHS[m-1]} ${yr}: ${retStr(r)}">${(r*100).toFixed(1)}%</td>`
-          : `<td class="empty">—</td>`;
+    // Heatmap
+    const hmap=Analytics.heatmapData(history);
+    const annual=Analytics.annualReturns(history);
+    const years=Object.keys(hmap).sort();
+    let htbl='<table><thead><tr><th></th>'+MONTHS.map(m=>`<th>${m}</th>`).join('')+'<th>Year</th></tr></thead><tbody>';
+    for(const yr of years){
+      const ann=annual.find(a=>a.year===yr);
+      htbl+=`<tr><td class="yr-label">${yr}</td>`;
+      for(let m=1;m<=12;m++){
+        const r=hmap[yr][m];
+        htbl+=r!=null
+          ?`<td style="${heatColor(r)}" title="${MONTHS[m-1]} ${yr}: ${retStr(r)}">${(r*100).toFixed(1)}%</td>`
+          :`<td class="empty">—</td>`;
       }
-      htbl += ann?.ret != null
-        ? `<td style="${heatColor(ann.ret)};font-weight:800">${(ann.ret*100).toFixed(1)}%</td>`
-        : '<td class="empty">—</td>';
-      htbl += '</tr>';
+      htbl+=ann?.ret!=null?`<td style="${heatColor(ann.ret)};font-weight:800">${(ann.ret*100).toFixed(1)}%</td>`:'<td class="empty">—</td>';
+      htbl+='</tr>';
     }
-    htbl += '</tbody></table>';
-    document.getElementById('heatmap').innerHTML = htbl;
+    htbl+='</tbody></table>';
+    document.getElementById('heatmap').innerHTML=htbl;
 
-    // ── Annual returns ────────────────────────────────────────────────
-    document.getElementById('annual-card').innerHTML = annual.map(a => `
+    // Annual
+    document.getElementById('annual-card').innerHTML=annual.map(a=>`
       <div class="annual-row">
-        <div style="font-weight:800;font-size:14px;color:var(--t1)">${a.year}</div>
-        <div style="font-size:13px;color:var(--t3)">${formatCAD(a.startVal)} → ${formatCAD(a.endVal)}</div>
-        <div style="font-size:14px;font-weight:800" class="${(a.ret||0)>=0?'positive':'negative'}">
+        <div style="font-weight:700;font-size:14px;color:var(--ink)">${a.year}</div>
+        <div style="font-size:12px;color:var(--ink-4)">${formatCAD(a.startVal)} → ${formatCAD(a.endVal)}</div>
+        <div style="font-size:14px;font-weight:700" class="${(a.ret||0)>=0?'positive':'negative'}">
           ${a.ret!=null?retStr(a.ret):'—'}
-          <span style="font-size:11px;font-weight:400;color:var(--t4);margin-left:6px">${formatCAD(a.change)}</span>
+          <span style="font-size:11px;font-weight:400;color:var(--ink-4);margin-left:6px">${formatCAD(a.change)}</span>
         </div>
       </div>`).join('');
 
-    // ── Industry allocation ───────────────────────────────────────────
-    document.getElementById('alloc-date').textContent = 'as of ' + formatDate(snap.date);
-    Charts.sectorBars('industry-alloc', positions);
+    // Industry
+    document.getElementById('alloc-date').textContent='as of '+formatDate(snap.date);
+    Charts.sectorBars('industry-alloc',positions);
 
-    // ── Stock table ───────────────────────────────────────────────────
     renderStockTable();
-
-  } catch(e) {
-    console.error(e);
-    document.getElementById('subtitle').textContent = 'Error: ' + e.message;
-  }
+  }catch(e){console.error(e);document.getElementById('subtitle').textContent='Error: '+e.message;}
 }
-
 init();
 </script>
-</body>
-</html>
+</body></html>
