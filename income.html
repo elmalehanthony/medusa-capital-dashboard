@@ -7,122 +7,67 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <nav class="navbar">
-    <div class="nav-brand">
-      <div class="nav-logo"><svg viewBox="0 0 16 16" fill="#fff"><path d="M8 1.5L1.5 6v9h4v-5h5v5h4V6L8 1.5z"/></svg></div>
-      <div class="nav-brand-text">
-        <div class="nav-brand-name">Medusa Capital</div>
-        <div class="nav-brand-sub">#230-32415</div>
-      </div>
-    </div>
-    <div class="nav-links">
-      <a href="index.html">Overview</a>
-      <a href="positions.html">Holdings</a>
-      <a href="transactions.html">Activity</a>
-      <a href="income.html" class="active">Income</a>
-      <a href="upload.html">Upload</a>
-    </div>
-    <button class="nav-hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
-  </nav>
-  <div class="nav-drawer" id="nav-drawer">
-    <a href="index.html">Overview</a>
-    <a href="positions.html">Holdings</a>
-    <a href="transactions.html">Activity</a>
-    <a href="income.html" class="active">Income</a>
-    <a href="upload.html">Upload</a>
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="nav-logo"><svg viewBox="0 0 16 16" fill="#fff"><path d="M8 1.5L1.5 6v9h4v-5h5v5h4V6L8 1.5z"/></svg></div>
+    <div class="nav-brand-text"><div class="nav-brand-name">Medusa Capital</div><div class="nav-brand-sub">#230-32415</div></div>
   </div>
-
-  <main class="container">
-    <div class="page-header">
-      <div>
-        <h1>Income</h1>
-        <p class="subtitle" id="subtitle">Loading…</p>
-      </div>
+  <div class="nav-links">
+    <a href="index.html">Overview</a><a href="positions.html">Holdings</a>
+    <a href="performance.html">Performance</a><a href="transactions.html">Activity</a>
+    <a href="income.html" class="active">Income</a><a href="upload.html">Upload</a>
+  </div>
+  <button class="nav-hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="nav-drawer" id="nav-drawer">
+  <a href="index.html">Overview</a><a href="positions.html">Holdings</a>
+  <a href="performance.html">Performance</a><a href="transactions.html">Activity</a>
+  <a href="income.html" class="active">Income</a><a href="upload.html">Upload</a>
+</div>
+<main class="container">
+  <div class="page-header"><div><h1>Income</h1><p class="subtitle" id="subtitle">Loading…</p></div></div>
+  <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="kpi-card"><div class="kpi-label">Total Income</div><div class="kpi-value positive" id="kpi-total">—</div><div class="kpi-sub">All time (CAD equiv.)</div></div>
+    <div class="kpi-card"><div class="kpi-label">YTD Income</div><div class="kpi-value positive" id="kpi-ytd">—</div><div class="kpi-sub">This calendar year</div></div>
+    <div class="kpi-card"><div class="kpi-label">Unique Payers</div><div class="kpi-value" id="kpi-payers">—</div><div class="kpi-sub">Dividend-paying positions</div></div>
+  </div>
+  <div class="card">
+    <div class="table-scroll">
+      <table><thead><tr><th>Date</th><th>Type</th><th>Ticker</th><th>Description</th><th class="num">Amount</th><th>Cur</th></tr></thead>
+      <tbody id="tbody"></tbody></table>
     </div>
-
-    <div class="kpi-grid" style="--kpi-cols:3">
-      <div class="kpi-card">
-        <div class="kpi-label">Total Income</div>
-        <div class="kpi-value positive" id="kpi-total">—</div>
-        <div class="kpi-sub">All time (CAD equiv.)</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">YTD Income</div>
-        <div class="kpi-value positive" id="kpi-ytd">—</div>
-        <div class="kpi-sub">This calendar year</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Unique Payers</div>
-        <div class="kpi-value" id="kpi-payers">—</div>
-        <div class="kpi-sub">Dividend-paying positions</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="table-scroll">
-        <table>
-          <thead><tr>
-            <th>Date</th>
-            <th>Type</th>
-            <th>Ticker</th>
-            <th>Description</th>
-            <th class="num">Amount</th>
-            <th>Cur</th>
-          </tr></thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </main>
-
-  <nav class="bottom-nav">
-    <div class="bnav-items">
-      <a href="index.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1h-4v-4H8v4H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>Overview</a>
-      <a href="positions.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Holdings</a>
-      <a href="transactions.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 13l4-4 3 3 4-5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Activity</a>
-      <a href="income.html" class="bnav-item active"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v6M8 9h3a1 1 0 010 2H9a1 1 0 000 2h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Income</a>
-      <a href="upload.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M10 13V7m0 0L7 10m3-3l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 14v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Upload</a>
-    </div>
-  </nav>
-
-  <script src="js/config.js"></script>
-  <script src="js/data.js"></script>
-  <script src="js/charts.js"></script>
-  <script>
-    document.getElementById('hamburger').addEventListener('click', () => document.getElementById('nav-drawer').classList.toggle('open'));
-
-    async function init() {
-      const [income, snap] = await Promise.all([Data.income(), Data.latestSnapshot()]);
-      const rate = snap?.fx_rate || 1.36;
-      const toCAD = i => i.currency === 'CAD' ? i.amount : i.amount * rate;
-
-      document.getElementById('subtitle').textContent = income.length ? income.length + ' payments recorded' : 'No income recorded yet';
-
-      const total = income.reduce((s, i) => s + toCAD(i), 0);
-      document.getElementById('kpi-total').textContent = formatCAD(total);
-
-      const yr = new Date().getFullYear().toString();
-      const ytd = income.filter(i => i.date?.startsWith(yr)).reduce((s, i) => s + toCAD(i), 0);
-      document.getElementById('kpi-ytd').textContent = formatCAD(ytd);
-
-      document.getElementById('kpi-payers').textContent = new Set(income.map(i => i.ticker).filter(Boolean)).size || '—';
-
-      const tbody = document.getElementById('tbody');
-      if (!income.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty">No income recorded. Upload a statement with dividend history.</td></tr>';
-        return;
-      }
-      tbody.innerHTML = income.map(i => `
-        <tr>
-          <td style="color:var(--text-muted);font-size:12px">${formatDate(i.date)}</td>
-          <td><span class="badge badge-purple">${i.type || 'dividend'}</span></td>
-          <td>${i.ticker ? `<span class="ticker-badge">${i.ticker}</span>` : '—'}</td>
-          <td class="desc" style="color:var(--text-secondary)">${i.description || ''}</td>
-          <td class="num positive">${i.currency === 'CAD' ? formatCAD(i.amount) : formatUSD(i.amount)}</td>
-          <td><span class="currency-tag ${i.currency}">${i.currency}</span></td>
-        </tr>`).join('');
-    }
-    init();
-  </script>
-</body>
-</html>
+  </div>
+</main>
+<nav class="bottom-nav"><div class="bnav-items">
+  <a href="index.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1h-4v-4H8v4H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>Overview</a>
+  <a href="positions.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Holdings</a>
+  <a href="performance.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 15l5-6 3 3 4-6 3 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Perf.</a>
+  <a href="income.html" class="bnav-item active"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v6M8 9h3a1 1 0 010 2H9a1 1 0 000 2h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Income</a>
+  <a href="upload.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M10 13V7m0 0L7 10m3-3l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 14v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Upload</a>
+</div></nav>
+<script src="js/config.js"></script><script src="js/data.js"></script><script src="js/charts.js"></script>
+<script>
+document.getElementById('hamburger').addEventListener('click', () => document.getElementById('nav-drawer').classList.toggle('open'));
+async function init() {
+  const [income, snap] = await Promise.all([Data.income(), Data.latestSnapshot()]);
+  const rate = snap?.fx_rate || 1.36;
+  const toCAD = i => i.currency === 'CAD' ? i.amount : i.amount * rate;
+  document.getElementById('subtitle').textContent = income.length ? income.length + ' payments recorded' : 'No income yet — upload a statement';
+  document.getElementById('kpi-total').textContent = formatCAD(income.reduce((s,i) => s+toCAD(i), 0));
+  const yr = new Date().getFullYear().toString();
+  document.getElementById('kpi-ytd').textContent = formatCAD(income.filter(i=>i.date?.startsWith(yr)).reduce((s,i)=>s+toCAD(i),0));
+  document.getElementById('kpi-payers').textContent = new Set(income.map(i=>i.ticker).filter(Boolean)).size || '—';
+  const tbody = document.getElementById('tbody');
+  if (!income.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">No income recorded yet.</td></tr>'; return; }
+  tbody.innerHTML = income.map(i => `<tr>
+    <td style="color:var(--text-muted);font-size:12px">${formatDate(i.date)}</td>
+    <td><span class="badge badge-purple">${i.type||'dividend'}</span></td>
+    <td>${i.ticker?`<span class="ticker-badge">${i.ticker}</span>`:'—'}</td>
+    <td class="desc" style="color:var(--text-secondary)">${i.description||''}</td>
+    <td class="num positive">${i.currency==='CAD'?formatCAD(i.amount):formatUSD(i.amount)}</td>
+    <td><span class="currency-tag ${i.currency}">${i.currency}</span></td>
+  </tr>`).join('');
+}
+init();
+</script>
+</body></html>

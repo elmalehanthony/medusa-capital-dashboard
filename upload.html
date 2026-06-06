@@ -5,86 +5,113 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Medusa Capital — Upload</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    .tab-bar { display:flex; gap:0; border-bottom:2px solid var(--border); margin-bottom:20px; }
+    .tab { padding:10px 18px; font-size:13px; font-weight:600; color:var(--text-muted); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all 0.15s; }
+    .tab.active { color:var(--bmo-blue); border-bottom-color:var(--bmo-blue); }
+    .tab-panel { display:none; } .tab-panel.active { display:block; }
+    .manual-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    @media(max-width:639px){ .manual-grid { grid-template-columns:1fr; } }
+    .manual-field { display:flex; flex-direction:column; gap:5px; }
+    .manual-field label { font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
+    .manual-field input { background:var(--bg-card); border:1px solid var(--border-strong); color:var(--text); padding:9px 12px; border-radius:var(--radius-sm); font-size:13px; }
+    .manual-field input:focus { outline:none; border-color:var(--bmo-blue); box-shadow:0 0 0 3px rgba(0,117,190,0.1); }
+  </style>
 </head>
 <body>
-  <nav class="navbar">
-    <div class="nav-brand">
-      <div class="nav-logo"><svg viewBox="0 0 16 16" fill="#fff"><path d="M8 1.5L1.5 6v9h4v-5h5v5h4V6L8 1.5z"/></svg></div>
-      <div class="nav-brand-text">
-        <div class="nav-brand-name">Medusa Capital</div>
-        <div class="nav-brand-sub">#230-32415</div>
-      </div>
-    </div>
-    <div class="nav-links">
-      <a href="index.html">Overview</a>
-      <a href="positions.html">Holdings</a>
-      <a href="transactions.html">Activity</a>
-      <a href="income.html">Income</a>
-      <a href="upload.html" class="active">Upload</a>
-    </div>
-    <button class="nav-hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
-  </nav>
-  <div class="nav-drawer" id="nav-drawer">
-    <a href="index.html">Overview</a>
-    <a href="positions.html">Holdings</a>
-    <a href="transactions.html">Activity</a>
-    <a href="income.html">Income</a>
-    <a href="upload.html" class="active">Upload</a>
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="nav-logo"><svg viewBox="0 0 16 16" fill="#fff"><path d="M8 1.5L1.5 6v9h4v-5h5v5h4V6L8 1.5z"/></svg></div>
+    <div class="nav-brand-text"><div class="nav-brand-name">Medusa Capital</div><div class="nav-brand-sub">#230-32415</div></div>
+  </div>
+  <div class="nav-links">
+    <a href="index.html">Overview</a><a href="positions.html">Holdings</a>
+    <a href="performance.html">Performance</a><a href="transactions.html">Activity</a>
+    <a href="income.html">Income</a><a href="upload.html" class="active">Upload</a>
+  </div>
+  <button class="nav-hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="nav-drawer" id="nav-drawer">
+  <a href="index.html">Overview</a><a href="positions.html">Holdings</a>
+  <a href="performance.html">Performance</a><a href="transactions.html">Activity</a>
+  <a href="income.html">Income</a><a href="upload.html" class="active">Upload</a>
+</div>
+
+<main class="container">
+  <div class="page-header">
+    <div><h1>Update Data</h1><p class="subtitle">Add a new monthly snapshot manually, or parse a BMO statement automatically.</p></div>
   </div>
 
-  <main class="container">
-    <div class="page-header">
-      <div>
-        <h1>Upload Statement</h1>
-        <p class="subtitle">Drop a BMO PDF or Dashboard XLSX — Claude parses it automatically.</p>
+  <div class="tab-bar">
+    <div class="tab active" data-tab="manual">Manual Entry</div>
+    <div class="tab" data-tab="auto">Auto-Parse (Claude API)</div>
+  </div>
+
+  <!-- MANUAL ENTRY TAB -->
+  <div class="tab-panel active" id="tab-manual">
+    <div class="card">
+      <h2>Monthly Snapshot</h2>
+      <div class="manual-grid">
+        <div class="manual-field"><label>Date (YYYY-MM-DD)</label><input type="date" id="m-date"></div>
+        <div class="manual-field"><label>Total Portfolio (CAD)</label><input type="number" id="m-total" placeholder="145783.96" step="0.01"></div>
+        <div class="manual-field"><label>CAD Holdings Value</label><input type="number" id="m-cad" placeholder="31540.78" step="0.01"></div>
+        <div class="manual-field"><label>USD Holdings (USD)</label><input type="number" id="m-usd" placeholder="84101.28" step="0.01"></div>
+        <div class="manual-field"><label>FX Rate (USD/CAD)</label><input type="number" id="m-fx" placeholder="1.3584" step="0.0001"></div>
+        <div class="manual-field"><label>Net Invested (Inception)</label><input type="number" id="m-invested" placeholder="87005.85" step="0.01"></div>
+        <div class="manual-field"><label>Market Change YTD</label><input type="number" id="m-ytd" placeholder="3332.06" step="0.01"></div>
+        <div class="manual-field"><label>Market Change (Inception)</label><input type="number" id="m-inception" placeholder="58778.11" step="0.01"></div>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" id="btn-preview">Preview Snapshot</button>
+        <button class="btn btn-secondary" id="btn-clear-manual">Clear</button>
       </div>
     </div>
 
+    <div class="card" id="manual-preview" style="display:none">
+      <h2>Preview</h2>
+      <div id="manual-preview-content"></div>
+      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" id="btn-save-manual">Save to Repo</button>
+        <button class="btn btn-secondary" id="btn-cancel-manual">Cancel</button>
+      </div>
+      <div id="manual-save-status" style="margin-top:12px;font-size:13px"></div>
+    </div>
+  </div>
+
+  <!-- AUTO-PARSE TAB -->
+  <div class="tab-panel" id="tab-auto">
     <div class="card">
-      <h2>API Keys <span class="badge badge-gray" style="text-transform:none;font-weight:500">Stored in your browser only — never sent to the repo</span></h2>
+      <h2>API Keys <span class="badge badge-gray" style="text-transform:none;font-weight:500">Browser only — never committed</span></h2>
       <div class="keys-grid">
         <div class="field-group">
           <label>Anthropic API Key</label>
-          <div class="input-row">
-            <input type="password" id="anthropic-key" placeholder="sk-ant-…" autocomplete="off">
-            <button class="btn btn-sm btn-primary" onclick="saveKey('anthropic')">Save</button>
-          </div>
+          <div class="input-row"><input type="password" id="anthropic-key" placeholder="sk-ant-…" autocomplete="off"><button class="btn btn-sm btn-primary" onclick="saveKey('anthropic')">Save</button></div>
           <p class="field-hint">Get yours at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
         </div>
         <div class="field-group">
-          <label>GitHub Personal Access Token</label>
-          <div class="input-row">
-            <input type="password" id="github-token" placeholder="ghp_…" autocomplete="off">
-            <button class="btn btn-sm btn-primary" onclick="saveKey('github')">Save</button>
-          </div>
+          <label>GitHub Token</label>
+          <div class="input-row"><input type="password" id="github-token" placeholder="ghp_…" autocomplete="off"><button class="btn btn-sm btn-primary" onclick="saveKey('github')">Save</button></div>
           <p class="field-hint">Needs <strong>repo</strong> scope. <a href="https://github.com/settings/tokens" target="_blank">Generate →</a></p>
         </div>
       </div>
       <div id="keys-status" class="keys-status"></div>
     </div>
-
     <div class="card">
       <h2>Drop File</h2>
       <div class="drop-zone" id="drop-zone">
         <div class="drop-icon">📄</div>
         <p style="font-size:15px;font-weight:600;color:var(--text)">Drag &amp; drop your BMO statement</p>
         <p class="drop-sub">PDF or XLSX</p>
-        <label class="btn btn-primary" style="cursor:pointer;margin-top:8px">
-          Browse Files
-          <input type="file" id="file-input" accept=".pdf,.xlsx" style="display:none">
-        </label>
-        <p class="drop-hint">BMO monthly PDF · Dashboard XLSX</p>
+        <label class="btn btn-primary" style="cursor:pointer;margin-top:8px">Browse Files<input type="file" id="file-input" accept=".pdf,.xlsx" style="display:none"></label>
       </div>
     </div>
-
     <div id="status-card" class="card" style="display:none">
       <h2>Processing</h2>
-      <div id="step-read" class="step">⏳ Reading file…</div>
-      <div id="step-parse" class="step">⏳ Sending to Claude API…</div>
-      <div id="step-merge" class="step">⏳ Merging into portfolio…</div>
-      <div id="step-save" class="step">⏳ Saving to GitHub…</div>
+      <div id="step-read" class="step">⏳ Reading…</div>
+      <div id="step-parse" class="step">⏳ Parsing…</div>
+      <div id="step-merge" class="step">⏳ Merging…</div>
+      <div id="step-save" class="step">⏳ Saving…</div>
     </div>
-
     <div id="preview-card" class="card" style="display:none">
       <h2>Review Before Saving</h2>
       <div id="preview-content"></div>
@@ -93,135 +120,163 @@
         <button class="btn btn-secondary" id="btn-discard">Discard</button>
       </div>
     </div>
-  </main>
+  </div>
 
-  <nav class="bottom-nav">
-    <div class="bnav-items">
-      <a href="index.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1h-4v-4H8v4H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>Overview</a>
-      <a href="positions.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Holdings</a>
-      <a href="transactions.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 13l4-4 3 3 4-5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Activity</a>
-      <a href="income.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v6M8 9h3a1 1 0 010 2H9a1 1 0 000 2h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Income</a>
-      <a href="upload.html" class="bnav-item active"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M10 13V7m0 0L7 10m3-3l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 14v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Upload</a>
-    </div>
-  </nav>
+</main>
 
-  <script src="js/config.js"></script>
-  <script src="js/data.js"></script>
-  <script src="js/parser.js"></script>
-  <script src="js/github.js"></script>
-  <script src="js/charts.js"></script>
-  <script>
-    document.getElementById('hamburger').addEventListener('click', () => document.getElementById('nav-drawer').classList.toggle('open'));
+<nav class="bottom-nav"><div class="bnav-items">
+  <a href="index.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1h-4v-4H8v4H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>Overview</a>
+  <a href="positions.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Holdings</a>
+  <a href="performance.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M3 15l5-6 3 3 4-6 3 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Perf.</a>
+  <a href="income.html" class="bnav-item"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v6M8 9h3a1 1 0 010 2H9a1 1 0 000 2h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Income</a>
+  <a href="upload.html" class="bnav-item active"><div class="bnav-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M10 13V7m0 0L7 10m3-3l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 14v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Upload</a>
+</div></nav>
 
-    let parsedData = null, mergedData = null;
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/parser.js"></script>
+<script src="js/github.js"></script>
+<script src="js/charts.js"></script>
+<script>
+document.getElementById('hamburger').addEventListener('click', () =>
+  document.getElementById('nav-drawer').classList.toggle('open'));
 
-    window.addEventListener('load', () => {
-      const ak = Keys.getAnthropic(), gk = Keys.getGithub();
-      if (ak) document.getElementById('anthropic-key').value = ak;
-      if (gk) document.getElementById('github-token').value = gk;
-      updateKeysStatus();
-    });
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab,.tab-panel').forEach(el => el.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
 
-    function saveKey(type) {
-      if (type === 'anthropic') Keys.setAnthropic(document.getElementById('anthropic-key').value.trim());
-      else Keys.setGithub(document.getElementById('github-token').value.trim());
-      updateKeysStatus();
-    }
+// Keys
+window.addEventListener('load', () => {
+  const ak = Keys.getAnthropic(), gk = Keys.getGithub();
+  if (ak) document.getElementById('anthropic-key').value = ak;
+  if (gk) document.getElementById('github-token').value = gk;
+  updateKeysStatus();
+});
+function saveKey(type) {
+  if (type === 'anthropic') Keys.setAnthropic(document.getElementById('anthropic-key').value.trim());
+  else Keys.setGithub(document.getElementById('github-token').value.trim());
+  updateKeysStatus();
+}
+function updateKeysStatus() {
+  const hasA = !!Keys.getAnthropic(), hasG = !!Keys.getGithub();
+  document.getElementById('keys-status').innerHTML =
+    `<span class="${hasA?'ok':'missing'}">Anthropic: ${hasA?'✅ set':'❌ missing'}</span>
+     <span class="${hasG?'ok':'missing'}">GitHub: ${hasG?'✅ set':'❌ missing'}</span>`;
+}
 
-    function updateKeysStatus() {
-      const hasA = !!Keys.getAnthropic(), hasG = !!Keys.getGithub();
-      document.getElementById('keys-status').innerHTML =
-        `<span class="${hasA ? 'ok' : 'missing'}">Anthropic: ${hasA ? '✅ set' : '❌ missing'}</span>
-         <span class="${hasG ? 'ok' : 'missing'}">GitHub: ${hasG ? '✅ set' : '❌ missing'}</span>`;
-    }
+// Manual entry
+let manualSnapshot = null;
+document.getElementById('btn-preview').addEventListener('click', () => {
+  const date = document.getElementById('m-date').value;
+  if (!date) { alert('Please enter a date.'); return; }
+  manualSnapshot = {
+    date,
+    total_cad: parseFloat(document.getElementById('m-total').value) || null,
+    cad_holdings: parseFloat(document.getElementById('m-cad').value) || null,
+    usd_holdings_usd: parseFloat(document.getElementById('m-usd').value) || null,
+    fx_rate: parseFloat(document.getElementById('m-fx').value) || null,
+    net_invested_inception: parseFloat(document.getElementById('m-invested').value) || null,
+    market_change_ytd: parseFloat(document.getElementById('m-ytd').value) || null,
+    market_change_inception: parseFloat(document.getElementById('m-inception').value) || null,
+  };
+  const rows = Object.entries(manualSnapshot)
+    .map(([k,v]) => `<tr><td style="color:var(--text-muted);padding:5px 8px;font-size:12px">${k}</td><td style="font-weight:600;padding:5px 8px;font-size:13px">${v ?? '—'}</td></tr>`).join('');
+  document.getElementById('manual-preview-content').innerHTML =
+    `<table style="width:100%;border-collapse:collapse">${rows}</table>`;
+  document.getElementById('manual-preview').style.display = 'block';
+});
+document.getElementById('btn-clear-manual').addEventListener('click', () => {
+  ['m-date','m-total','m-cad','m-usd','m-fx','m-invested','m-ytd','m-inception']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('manual-preview').style.display = 'none';
+});
+document.getElementById('btn-cancel-manual').addEventListener('click', () => {
+  document.getElementById('manual-preview').style.display = 'none';
+});
+document.getElementById('btn-save-manual').addEventListener('click', async () => {
+  const token = Keys.getGithub();
+  if (!token) { alert('GitHub token required. Add it in the Auto-Parse tab.'); return; }
+  const statusEl = document.getElementById('manual-save-status');
+  statusEl.textContent = '⏳ Saving…';
+  statusEl.style.color = 'var(--bmo-blue)';
+  try {
+    const data = await Data.merge({ snapshot: manualSnapshot, positions: [], transactions: [], income: [] });
+    await Github.savePortfolio(data);
+    statusEl.textContent = '✅ Saved! Deploying in ~30s.';
+    statusEl.style.color = 'var(--green)';
+    document.getElementById('btn-save-manual').disabled = true;
+  } catch(e) {
+    statusEl.textContent = '❌ Error: ' + e.message;
+    statusEl.style.color = 'var(--red)';
+  }
+});
 
-    const dropZone = document.getElementById('drop-zone');
-    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-    dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
-    document.getElementById('file-input').addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+// Auto-parse
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+document.getElementById('file-input').addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
 
-    function setStep(id, state, text) {
-      const el = document.getElementById(id);
-      const icons = { pending:'⏳', ok:'✅', error:'❌', active:'🔄' };
-      el.textContent = (icons[state] || '⏳') + ' ' + text;
-      el.className = 'step step-' + state;
-    }
-
-    async function handleFile(file) {
-      parsedData = null; mergedData = null;
-      document.getElementById('status-card').style.display = 'block';
-      document.getElementById('preview-card').style.display = 'none';
-      ['step-read','step-parse','step-merge','step-save'].forEach(id => setStep(id,'pending',id.replace('step-','').replace('-',' ')+'...'));
-      try {
-        setStep('step-read','active',`Reading ${file.name} (${(file.size/1024).toFixed(0)} KB)…`);
-        await new Promise(r => setTimeout(r,50));
-        setStep('step-read','ok',`Ready: ${file.name}`);
-        setStep('step-parse','active','Sending to Claude API…');
-        parsedData = await Parser.parseFile(file);
-        setStep('step-parse','ok',`Extracted: ${parsedData.positions?.length||0} positions, ${parsedData.transactions?.length||0} transactions`);
-        setStep('step-merge','active','Merging…');
-        mergedData = await Data.merge(parsedData);
-        setStep('step-merge','ok','Merged — review below before saving');
-        setStep('step-save','pending','Waiting for your confirmation…');
-        showPreview(parsedData);
-      } catch(e) {
-        const active = ['step-read','step-parse','step-merge'].find(s => document.getElementById(s).className.includes('active')) || 'step-read';
-        setStep(active,'error','Error: ' + e.message);
-        console.error(e);
-      }
-    }
-
-    function showPreview(data) {
-      const s = data.snapshot;
-      document.getElementById('preview-content').innerHTML = `
-        <div class="preview-grid">
-          <div class="preview-section">
-            <h3>Snapshot — ${s?.date || '?'}</h3>
-            <table class="mini-table">
-              <tr><td>Total (CAD)</td><td><strong>${s ? formatCAD(s.total_cad) : '—'}</strong></td></tr>
-              <tr><td>FX Rate</td><td>${s?.fx_rate || '—'}</td></tr>
-              <tr><td>YTD Change</td><td class="${(s?.market_change_ytd||0)>=0?'positive':'negative'}">${s ? formatCAD(s.market_change_ytd) : '—'}</td></tr>
-              <tr><td>Net Invested</td><td>${s ? formatCAD(s.net_invested_inception) : '—'}</td></tr>
-            </table>
-          </div>
-          <div class="preview-section">
-            <h3>Positions (${data.positions?.length||0})</h3>
-            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">
-              ${data.positions?.slice(0,10).map(p => `<span class="ticker-badge ${p.currency}">${p.ticker}</span>`).join('') || 'None'}
-              ${(data.positions?.length||0) > 10 ? `<span style="color:var(--text-muted);font-size:11px">+${data.positions.length-10} more</span>` : ''}
-            </div>
-          </div>
-          <div class="preview-section">
-            <h3>Transactions (${data.transactions?.length||0})</h3>
-            <p style="color:var(--text-muted);font-size:12px;line-height:1.8">${data.transactions?.slice(0,4).map(t => `${t.date} <strong>${t.type}</strong> ${t.ticker||''}`).join('<br>') || 'None'}</p>
-          </div>
-          <div class="preview-section">
-            <h3>Income (${data.income?.length||0})</h3>
-            <p style="color:var(--text-muted);font-size:12px;line-height:1.8">${data.income?.slice(0,4).map(i => `${i.date} ${i.ticker||''} <strong>${i.currency==='CAD'?formatCAD(i.amount):formatUSD(i.amount)}</strong>`).join('<br>') || 'None'}</p>
-          </div>
+let parsedData = null, mergedData = null;
+function setStep(id, state, text) {
+  const el = document.getElementById(id);
+  el.textContent = ({pending:'⏳',ok:'✅',error:'❌',active:'🔄'}[state]||'⏳') + ' ' + text;
+  el.className = 'step step-' + state;
+}
+async function handleFile(file) {
+  parsedData = null; mergedData = null;
+  document.getElementById('status-card').style.display = 'block';
+  document.getElementById('preview-card').style.display = 'none';
+  ['step-read','step-parse','step-merge','step-save'].forEach(id => setStep(id,'pending','waiting…'));
+  try {
+    setStep('step-read','active',`Reading ${file.name} (${(file.size/1024).toFixed(0)} KB)…`);
+    await new Promise(r => setTimeout(r,50));
+    setStep('step-read','ok',`Ready: ${file.name}`);
+    setStep('step-parse','active','Sending to Claude API…');
+    parsedData = await Parser.parseFile(file);
+    setStep('step-parse','ok',`Extracted: ${parsedData.positions?.length||0} positions, ${parsedData.transactions?.length||0} transactions`);
+    setStep('step-merge','active','Merging…');
+    mergedData = await Data.merge(parsedData);
+    setStep('step-merge','ok','Merged — review below');
+    setStep('step-save','pending','Awaiting confirmation…');
+    const s = parsedData.snapshot;
+    document.getElementById('preview-content').innerHTML = `
+      <div class="preview-grid">
+        <div class="preview-section"><h3>Snapshot — ${s?.date||'?'}</h3>
+          <table class="mini-table">
+            <tr><td>Total (CAD)</td><td><strong>${s?formatCAD(s.total_cad):'—'}</strong></td></tr>
+            <tr><td>FX Rate</td><td>${s?.fx_rate||'—'}</td></tr>
+            <tr><td>YTD Change</td><td class="${(s?.market_change_ytd||0)>=0?'positive':'negative'}">${s?formatCAD(s.market_change_ytd):'—'}</td></tr>
+          </table></div>
+        <div class="preview-section"><h3>Positions (${parsedData.positions?.length||0})</h3>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${parsedData.positions?.slice(0,12).map(p=>`<span class="ticker-badge ${p.currency}">${p.ticker}</span>`).join('')||'None'}</div>
         </div>
-        <details style="margin-top:12px">
-          <summary>View raw JSON</summary>
-          <pre>${JSON.stringify(data,null,2)}</pre>
-        </details>`;
-      document.getElementById('preview-card').style.display = 'block';
-      document.getElementById('btn-save').onclick = saveToRepo;
-      document.getElementById('btn-discard').onclick = () => { document.getElementById('preview-card').style.display = 'none'; Data._cache = null; };
-    }
-
-    async function saveToRepo() {
-      if (!mergedData) return;
+      </div>`;
+    document.getElementById('preview-card').style.display = 'block';
+    document.getElementById('btn-save').onclick = async () => {
       setStep('step-save','active','Committing to GitHub…');
       try {
         await Github.savePortfolio(mergedData);
-        setStep('step-save','ok','Saved! Dashboard will reflect changes on next load.');
+        setStep('step-save','ok','Saved! Dashboard updates in ~30s.');
         document.getElementById('btn-save').disabled = true;
-        document.getElementById('btn-save').textContent = '✅ Saved';
-      } catch(e) {
-        setStep('step-save','error','Save failed: ' + e.message);
-      }
-    }
-  </script>
+      } catch(e) { setStep('step-save','error','Failed: ' + e.message); }
+    };
+    document.getElementById('btn-discard').onclick = () => {
+      document.getElementById('preview-card').style.display = 'none';
+      Data._cache = null;
+    };
+  } catch(e) {
+    const active = ['step-read','step-parse','step-merge'].find(s => document.getElementById(s).className.includes('active')) || 'step-parse';
+    setStep(active,'error','Error: ' + e.message);
+    console.error(e);
+  }
+}
+</script>
 </body>
 </html>
