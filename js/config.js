@@ -1,5 +1,5 @@
 // config.js — runtime configuration
-// API keys are stored in localStorage only, never in this file
+// API keys stored in localStorage only, never committed
 
 const CONFIG = {
   github: {
@@ -9,7 +9,7 @@ const CONFIG = {
     dataPath: 'data/portfolio.json'
   },
   claude: {
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-sonnet-4-6',
     maxTokens: 4000
   },
   account: {
@@ -19,7 +19,6 @@ const CONFIG = {
   }
 };
 
-// Key management — localStorage only
 const Keys = {
   getAnthropic: () => localStorage.getItem('mc_anthropic_key') || '',
   setAnthropic: (k) => localStorage.setItem('mc_anthropic_key', k),
