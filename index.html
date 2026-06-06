@@ -8,12 +8,13 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-
 <nav class="navbar">
   <div class="nav-brand">
-    <div class="nav-dot"></div>
-    <span class="nav-brand-name">Medusa Capital</span>
-    <span class="nav-brand-sub">#230-32415</span>
+    <div class="nav-logo"><svg viewBox="0 0 16 16"><path d="M8 1.5L1.5 6v9h4v-5h5v5h4V6L8 1.5z"/></svg></div>
+    <div>
+      <div class="nav-brand-name">Medusa Capital</div>
+      <div class="nav-brand-sub">#230-32415</div>
+    </div>
   </div>
   <div class="nav-links">
     <a href="index.html" class="active">Overview</a>
@@ -23,7 +24,7 @@
     <a href="income.html">Income</a>
     <a href="upload.html">Upload</a>
   </div>
-  <button class="nav-hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <button class="nav-hamburger" id="hamburger"><span></span><span></span><span></span></button>
 </nav>
 <div class="nav-drawer" id="nav-drawer">
   <a href="index.html" class="active">Overview</a>
@@ -35,14 +36,12 @@
 </div>
 
 <div class="hero">
-  <div class="hero-eyebrow" id="hero-date">Loading…</div>
-  <div class="hero-row">
-    <div>
-      <div class="hero-value"><span class="hero-currency">CA$</span><span id="hero-number">—</span></div>
-    </div>
-    <div class="hero-right" id="hero-right" style="display:none">
-      <div class="hero-inception-label">Total return since inception</div>
-      <div class="hero-return" id="hero-return">—</div>
+  <div class="hero-label" id="hero-date">Portfolio value</div>
+  <div class="hero-main">
+    <div class="hero-value"><span class="hero-currency">CA$</span><span id="hero-number">—</span></div>
+    <div class="hero-return-block" id="hero-return-block" style="display:none">
+      <div class="hero-return-label">Total return</div>
+      <div class="hero-return-value" id="hero-return">—</div>
     </div>
   </div>
   <div class="hero-pills" id="hero-pills"></div>
@@ -51,7 +50,7 @@
 
 <main class="container">
   <div class="kpi-grid" style="margin-top:4px">
-    <div class="kpi-card"><div class="kpi-label">Total Return</div><div class="kpi-value positive" id="kpi-return">—</div><div class="kpi-sub" id="kpi-return-sub"></div></div>
+    <div class="kpi-card"><div class="kpi-label">Total Return</div><div class="kpi-value" id="kpi-return">—</div><div class="kpi-sub" id="kpi-return-sub"></div></div>
     <div class="kpi-card"><div class="kpi-label">vs Last Month</div><div class="kpi-value" id="kpi-mom">—</div><div class="kpi-sub" id="kpi-mom-sub"></div></div>
     <div class="kpi-card"><div class="kpi-label">YTD Change</div><div class="kpi-value" id="kpi-ytd">—</div><div class="kpi-sub">Jan 1 → today</div></div>
     <div class="kpi-card"><div class="kpi-label">Net Invested</div><div class="kpi-value" id="kpi-invested">—</div><div class="kpi-sub">Since Mar 2020</div></div>
@@ -63,7 +62,7 @@
     <div class="section-title">Top Holdings</div>
     <a href="positions.html" class="section-link">All holdings →</a>
   </div>
-  <div class="holding-list" id="top-holdings"><div class="card"><p class="empty">Loading…</p></div></div>
+  <div id="top-holdings"><div class="card"><p class="empty">Loading…</p></div></div>
 
   <div class="section-header">
     <div class="section-title">Sector Allocation</div>
@@ -73,15 +72,15 @@
 
   <div class="section-header">
     <div class="section-title">Portfolio History</div>
-    <span style="font-size:11px;color:var(--t4)" id="history-range"></span>
+    <span style="font-size:11px;color:var(--ink-4)" id="history-range"></span>
   </div>
-  <div class="card"><div style="position:relative;height:260px"><canvas id="chart-history"></canvas></div></div>
+  <div class="card"><div style="position:relative;height:240px"><canvas id="chart-history"></canvas></div></div>
 
   <div class="section-header">
     <div class="section-title">Top Performers</div>
     <a href="performance.html" class="section-link">Full report →</a>
   </div>
-  <div class="card"><div style="position:relative;height:300px"><canvas id="chart-performers"></canvas></div></div>
+  <div class="card"><div style="position:relative;height:280px"><canvas id="chart-performers"></canvas></div></div>
 </main>
 
 <nav class="bottom-nav"><div class="bnav-items">
@@ -97,110 +96,105 @@
 <script src="js/analytics.js"></script>
 <script src="js/charts.js"></script>
 <script>
-document.getElementById('hamburger').addEventListener('click', () =>
-  document.getElementById('nav-drawer').classList.toggle('open'));
+document.getElementById('hamburger').addEventListener('click',()=>document.getElementById('nav-drawer').classList.toggle('open'));
 
-function showError(msg) {
-  document.getElementById('hero-date').textContent = 'Data error';
-  document.getElementById('hero-number').textContent = 'Could not load';
-  document.getElementById('top-holdings').innerHTML =
-    `<div class="card" style="border-left:3px solid var(--red);border-radius:0 var(--r-lg) var(--r-lg) 0">
-      <p style="color:var(--red);font-size:13px;font-weight:700;margin-bottom:6px">${msg}</p>
-      <p style="color:var(--t3);font-size:12px">Check <code>data/portfolio.json</code> is committed, then <a href="upload.html">upload a statement</a>.</p>
-    </div>`;
+function showError(msg){
+  document.getElementById('hero-date').textContent='Error';
+  document.getElementById('hero-number').textContent='Data unavailable';
+  document.getElementById('top-holdings').innerHTML=
+    `<div class="card" style="border-left:3px solid var(--red)"><p style="color:var(--red);font-weight:600;margin-bottom:4px">${msg}</p><p style="color:var(--ink-4);font-size:12px">Check <code>data/portfolio.json</code> is committed, then <a href="upload.html">upload a statement</a>.</p></div>`;
 }
 
-async function init() {
-  try {
-    const [snap, history, positions] = await Promise.all([
-      Data.latestSnapshot(), Data.snapshotHistory(), Data.positions()
-    ]);
-    if (!snap) { showError('No snapshot data found in portfolio.json'); return; }
+async function init(){
+  try{
+    const [snap,history,positions]=await Promise.all([Data.latestSnapshot(),Data.snapshotHistory(),Data.positions()]);
+    if(!snap){showError('No data found in portfolio.json');return;}
 
-    document.getElementById('hero-date').textContent =
-      'Portfolio value · ' + new Date(snap.date+'T00:00:00')
-        .toLocaleDateString('en-CA',{month:'long',day:'numeric',year:'numeric'}).toUpperCase();
-    document.getElementById('hero-number').textContent =
+    // Hero
+    document.getElementById('hero-date').textContent=
+      new Date(snap.date+'T00:00:00').toLocaleDateString('en-CA',{month:'long',day:'numeric',year:'numeric'}).toUpperCase();
+    document.getElementById('hero-number').textContent=
       Math.abs(snap.total_cad).toLocaleString('en-CA',{minimumFractionDigits:0,maximumFractionDigits:0});
 
-    if (snap.market_change_inception != null && snap.net_invested_inception) {
-      const pct = snap.market_change_inception / snap.net_invested_inception;
-      document.getElementById('hero-return').textContent =
-        (pct>=0?'+':'') + (pct*100).toFixed(1)+'% · '+formatCAD(snap.market_change_inception);
-      document.getElementById('hero-right').style.display = 'block';
+    if(snap.market_change_inception!=null&&snap.net_invested_inception){
+      const pct=snap.market_change_inception/snap.net_invested_inception;
+      document.getElementById('hero-return').textContent=
+        (pct>=0?'+':'')+( pct*100).toFixed(1)+'%  ·  '+formatCAD(snap.market_change_inception);
+      document.getElementById('hero-return-block').style.display='block';
     }
 
-    const pills = [];
-    if (history.length >= 2) {
-      const prev = history[history.length-2];
-      const mom = snap.total_cad - prev.total_cad;
-      const momPct = prev.total_cad ? mom/prev.total_cad : 0;
+    const pills=[];
+    if(history.length>=2){
+      const prev=history[history.length-2];
+      const mom=snap.total_cad-prev.total_cad;
+      const momPct=prev.total_cad?mom/prev.total_cad:0;
       pills.push(`<span class="hero-pill ${mom>=0?'pos':'neg'}">${mom>=0?'+':''}${formatCAD(mom)} vs last month (${formatPct(momPct)})</span>`);
     }
-    if (snap.market_change_ytd != null)
+    if(snap.market_change_ytd!=null)
       pills.push(`<span class="hero-pill ${snap.market_change_ytd>=0?'pos':'neg'}">${snap.market_change_ytd>=0?'+':''}${formatCAD(snap.market_change_ytd)} YTD</span>`);
-    if (snap.fx_rate)
+    if(snap.fx_rate)
       pills.push(`<span class="hero-pill neutral">USD/CAD ${snap.fx_rate.toFixed(4)}</span>`);
-    document.getElementById('hero-pills').innerHTML = pills.join('');
+    document.getElementById('hero-pills').innerHTML=pills.join('');
 
-    requestAnimationFrame(() => Charts.heroSparkline('chart-sparkline', history));
+    requestAnimationFrame(()=>Charts.heroSparkline('chart-sparkline',history));
 
-    const gain = snap.market_change_inception;
-    const gainPct = snap.net_invested_inception && gain!=null ? gain/snap.net_invested_inception : null;
-    const kpiRet = document.getElementById('kpi-return');
-    kpiRet.textContent = gainPct!=null ? formatPct(gainPct) : '—';
-    kpiRet.className = 'kpi-value '+((gainPct||0)>=0?'positive':'negative');
-    document.getElementById('kpi-return-sub').textContent = gain!=null ? formatCAD(gain)+' gain' : '';
+    // KPIs
+    const gain=snap.market_change_inception;
+    const gainPct=snap.net_invested_inception&&gain!=null?gain/snap.net_invested_inception:null;
+    const kR=document.getElementById('kpi-return');
+    kR.textContent=gainPct!=null?formatPct(gainPct):'—';
+    kR.className='kpi-value '+((gainPct||0)>=0?'positive':'negative');
+    document.getElementById('kpi-return-sub').textContent=gain!=null?formatCAD(gain)+' gain':'';
 
-    if (history.length >= 2) {
-      const prev = history[history.length-2];
-      const mom = snap.total_cad - prev.total_cad;
-      const momPct = prev.total_cad ? mom/prev.total_cad : 0;
-      const el = document.getElementById('kpi-mom');
-      el.textContent = formatCAD(mom);
-      el.className = 'kpi-value '+(mom>=0?'positive':'negative');
-      document.getElementById('kpi-mom-sub').textContent = formatPct(momPct)+' · '+
-        new Date(prev.date+'T00:00:00').toLocaleDateString('en-CA',{month:'short',year:'2-digit'});
+    if(history.length>=2){
+      const prev=history[history.length-2];
+      const mom=snap.total_cad-prev.total_cad;
+      const momPct=prev.total_cad?mom/prev.total_cad:0;
+      const kM=document.getElementById('kpi-mom');
+      kM.textContent=formatCAD(mom);
+      kM.className='kpi-value '+(mom>=0?'positive':'negative');
+      document.getElementById('kpi-mom-sub').textContent=formatPct(momPct)+' · '+new Date(prev.date+'T00:00:00').toLocaleDateString('en-CA',{month:'short',year:'2-digit'});
     }
 
-    const kpiYtd = document.getElementById('kpi-ytd');
-    kpiYtd.textContent = snap.market_change_ytd!=null ? formatCAD(snap.market_change_ytd) : '—';
-    kpiYtd.className = 'kpi-value '+((snap.market_change_ytd||0)>=0?'positive':'negative');
-    document.getElementById('kpi-invested').textContent = snap.net_invested_inception!=null ? formatCAD(snap.net_invested_inception) : '—';
-    document.getElementById('kpi-usd').textContent = snap.usd_holdings_usd!=null ? formatUSD(snap.usd_holdings_usd) : '—';
-    document.getElementById('kpi-fx').textContent = snap.fx_rate ? '@ '+snap.fx_rate.toFixed(4)+' USD/CAD' : '';
-    document.getElementById('kpi-pos').textContent = positions.length || '—';
-    document.getElementById('kpi-pos-sub').textContent = positions.length
-      ? positions.filter(p=>p.currency==='CAD').length+' CAD · '+positions.filter(p=>p.currency==='USD').length+' USD' : '';
+    const kY=document.getElementById('kpi-ytd');
+    kY.textContent=snap.market_change_ytd!=null?formatCAD(snap.market_change_ytd):'—';
+    kY.className='kpi-value '+((snap.market_change_ytd||0)>=0?'positive':'negative');
+    document.getElementById('kpi-invested').textContent=snap.net_invested_inception!=null?formatCAD(snap.net_invested_inception):'—';
+    document.getElementById('kpi-usd').textContent=snap.usd_holdings_usd!=null?formatUSD(snap.usd_holdings_usd):'—';
+    document.getElementById('kpi-fx').textContent=snap.fx_rate?'@ '+snap.fx_rate.toFixed(4)+' USD/CAD':'';
+    document.getElementById('kpi-pos').textContent=positions.length||'—';
+    document.getElementById('kpi-pos-sub').textContent=positions.length?
+      positions.filter(p=>p.currency==='CAD').length+' CAD · '+positions.filter(p=>p.currency==='USD').length+' USD':'';
 
-    const totalCAD = snap.total_cad;
-    const topH = [...positions].filter(p=>p.current_value_cad).sort((a,b)=>b.current_value_cad-a.current_value_cad).slice(0,7);
-    document.getElementById('top-holdings').innerHTML = topH.length
-      ? '<div class="holding-list">'+topH.map(p => {
-          const weight = totalCAD ? (p.current_value_cad/totalCAD*100) : 0;
-          const ret = p.return_inception;
+    // Top Holdings
+    const totalCAD=snap.total_cad;
+    const topH=[...positions].filter(p=>p.current_value_cad).sort((a,b)=>b.current_value_cad-a.current_value_cad).slice(0,7);
+    document.getElementById('top-holdings').innerHTML=topH.length
+      ?'<div class="holding-list">'+topH.map(p=>{
+          const w=totalCAD?(p.current_value_cad/totalCAD*100):0;
+          const ret=p.return_inception;
           return `<div class="holding-row">
-            <div class="holding-bar" style="width:${weight.toFixed(1)}%"></div>
+            <div class="holding-bar" style="width:${w.toFixed(1)}%"></div>
             <div class="holding-left">
               <div class="holding-icon ${p.currency==='CAD'?'cad':'usd'}">${p.ticker.slice(0,4)}</div>
-              <div><div class="holding-name">${p.ticker} <span style="font-size:11px;font-weight:500;color:var(--t4)">${p.currency}</span></div>
-              <div class="holding-meta">${p.shares} sh · ${p.sector||'—'}</div></div>
+              <div>
+                <div class="holding-name">${p.ticker} <span style="font-size:10px;font-weight:500;color:var(--ink-4)">${p.currency}</span></div>
+                <div class="holding-meta">${p.shares} sh · ${p.sector||'—'}</div>
+              </div>
             </div>
             <div class="holding-right">
               <div class="holding-val">${formatCAD(p.current_value_cad)}</div>
               <div class="holding-ret ${(ret||0)>=0?'pos':'neg'}">${ret!=null?formatPct(ret)+' inception':'—'}</div>
             </div></div>`;
         }).join('')+'</div>'
-      : '<div class="card"><p class="empty">No positions. <a href="upload.html">Upload a statement</a>.</p></div>';
+      :'<div class="card"><p class="empty">No positions. <a href="upload.html">Upload a statement</a>.</p></div>';
 
-    Charts.sectorBars('sector-alloc', positions);
-    document.getElementById('history-range').textContent = history.length
-      ? formatDate(history[0].date)+' – '+formatDate(history[history.length-1].date) : '';
-    Charts.portfolioHistory('chart-history', history);
-    if (positions.length) Charts.performanceBar('chart-performers', positions);
-  } catch(e) { showError(e.message); console.error(e); }
+    Charts.sectorBars('sector-alloc',positions);
+    document.getElementById('history-range').textContent=history.length?formatDate(history[0].date)+' – '+formatDate(history[history.length-1].date):'';
+    Charts.portfolioHistory('chart-history',history);
+    if(positions.length) Charts.performanceBar('chart-performers',positions);
+  }catch(e){showError(e.message);console.error(e);}
 }
 init();
 </script>
-</body>
-</html>
+</body></html>
