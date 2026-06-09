@@ -595,7 +595,9 @@
       "net_invested_inception": 102005.85,
       "market_change_ytd": 8071.05,
       "market_change_inception": 63517.1,
-      "benchmarks": null
+      "benchmarks": null,
+      "cash_cad": 7941.25,
+      "cash_usd": 12.08
     }
   ],
   "positions": [
