@@ -56,6 +56,7 @@
     <div class="kpi-card"><div class="kpi-label">Net Invested</div><div class="kpi-value" id="kpi-invested">—</div><div class="kpi-sub">Since Mar 2020</div></div>
     <div class="kpi-card"><div class="kpi-label">USD Holdings</div><div class="kpi-value" id="kpi-usd">—</div><div class="kpi-sub" id="kpi-fx"></div></div>
     <div class="kpi-card"><div class="kpi-label">Positions</div><div class="kpi-value" id="kpi-pos">—</div><div class="kpi-sub" id="kpi-pos-sub"></div></div>
+    <div class="kpi-card"><div class="kpi-label">Cash on Hand</div><div class="kpi-value" id="kpi-cash-cad">—</div><div class="kpi-sub" id="kpi-cash-usd"></div></div>
   </div>
 
   <div class="section-header">
@@ -119,7 +120,7 @@ async function init(){
     if(snap.market_change_inception!=null&&snap.net_invested_inception){
       const pct=snap.market_change_inception/snap.net_invested_inception;
       document.getElementById('hero-return').textContent=
-        (pct>=0?'+':'')+( pct*100).toFixed(1)+'%  ·  '+formatCAD(snap.market_change_inception);
+        (pct>=0?'+':'')+(pct*100).toFixed(1)+'%  ·  '+formatCAD(snap.market_change_inception);
       document.getElementById('hero-return-block').style.display='block';
     }
 
@@ -166,6 +167,17 @@ async function init(){
     document.getElementById('kpi-pos-sub').textContent=positions.length?
       positions.filter(p=>p.currency==='CAD').length+' CAD · '+positions.filter(p=>p.currency==='USD').length+' USD':'';
 
+    // Cash on Hand
+    const kCashCAD=document.getElementById('kpi-cash-cad');
+    const kCashUSD=document.getElementById('kpi-cash-usd');
+    if(snap.cash_cad!=null||snap.cash_usd!=null){
+      kCashCAD.textContent=snap.cash_cad!=null?formatCAD(snap.cash_cad):'—';
+      kCashUSD.textContent=snap.cash_usd!=null?formatUSD(snap.cash_usd)+' USD':'';
+    } else {
+      kCashCAD.textContent='—';
+      kCashUSD.textContent='';
+    }
+
     // Top Holdings
     const totalCAD=snap.total_cad;
     const topH=[...positions].filter(p=>p.current_value_cad).sort((a,b)=>b.current_value_cad-a.current_value_cad).slice(0,7);
@@ -179,12 +191,12 @@ async function init(){
               <div class="holding-icon ${p.currency==='CAD'?'cad':'usd'}">${p.ticker.slice(0,4)}</div>
               <div>
                 <div class="holding-name">${p.ticker} <span style="font-size:10px;font-weight:500;color:var(--ink-4)">${p.currency}</span></div>
-                <div class="holding-meta">${p.shares} sh · ${p.sector||'—'}</div>
+                <div class="holding-meta">${p.shares} sh · ${p.sector||'—'}</div>
               </div>
             </div>
             <div class="holding-right">
               <div class="holding-val">${formatCAD(p.current_value_cad)}</div>
-              <div class="holding-ret ${(ret||0)>=0?'pos':'neg'}">${ret!=null?formatPct(ret)+' inception':'—'}</div>
+              <div class="holding-ret ${(ret||0)>=0?'pos':'neg'}">${ret!=null?formatPct(ret)+' inception':'—'}</div>
             </div></div>`;
         }).join('')+'</div>'
       :'<div class="card"><p class="empty">No positions. <a href="upload.html">Upload a statement</a>.</p></div>';
