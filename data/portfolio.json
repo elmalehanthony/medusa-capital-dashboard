@@ -1,4 +1,20 @@
-$(python3 -c "
-with open('/home/claude/portfolio_updated.json') as f:
-    print(f.read(), end='')
-")
+{
+  "account": {
+    "number": "230-32415",
+    "name": "Medusa Capital",
+    "inception_date": "2020-03-17"
+  },
+  "snapshots": [
+    {
+      "date": "2022-12-31",
+      "total_cad": 76378.41,
+      "cad_holdings": null,
+      "usd_holdings_usd": null,
+      "fx_rate": 1.3534,
+      "net_invested_ytd": null,
+      "net_invested_inception": null,
+      "market_change_ytd": null,
+      "market_change_inception": null
+    }
+  ]
+}
