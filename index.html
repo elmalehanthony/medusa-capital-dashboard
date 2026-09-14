@@ -74,7 +74,15 @@
 
   <div class="section-header">
     <div class="section-title">Portfolio History</div>
-    <span style="font-size:11px;color:var(--ink-4)" id="history-range"></span>
+    <div style="display:flex;align-items:center;gap:10px">
+      <select id="range-select" style="font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid #E0E0E0;background:#fff;color:var(--ink-2,#333);cursor:pointer">
+        <option value="1y">1Y</option>
+        <option value="3y">3Y</option>
+        <option value="5y">5Y</option>
+        <option value="all" selected>All</option>
+      </select>
+      <span style="font-size:11px;color:var(--ink-4)" id="history-range"></span>
+    </div>
   </div>
   <div class="card"><div style="position:relative;height:240px"><canvas id="chart-history"></canvas></div></div>
 
@@ -83,6 +91,11 @@
     <a href="performance.html" class="section-link">Full report →</a>
   </div>
   <div class="card"><div style="position:relative;height:280px"><canvas id="chart-performers"></canvas></div></div>
+
+  <div class="section-header">
+    <div class="section-title">Worst Performers</div>
+  </div>
+  <div class="card"><div style="position:relative;height:280px"><canvas id="chart-performers-worst"></canvas></div></div>
 </main>
 
 <nav class="bottom-nav"><div class="bnav-items">
@@ -99,6 +112,25 @@
 <script src="js/charts.js"></script>
 <script>
 document.getElementById('hamburger').addEventListener('click',()=>document.getElementById('nav-drawer').classList.toggle('open'));
+
+let fullHistory=[];
+
+// Thomas: "date-range dropdown on Overview" — filters the Portfolio History
+// chart only (KPI tiles above stay as the latest snapshot, per usual).
+function filterHistoryByRange(history,rangeKey){
+  if(rangeKey==='all'||!history.length) return history;
+  const years={'1y':1,'3y':3,'5y':5}[rangeKey];
+  if(!years) return history;
+  const cutoff=new Date(history[history.length-1].date+'T00:00:00');
+  cutoff.setFullYear(cutoff.getFullYear()-years);
+  return history.filter(s=>new Date(s.date+'T00:00:00')>=cutoff);
+}
+function renderHistoryChart(rangeKey){
+  const filtered=filterHistoryByRange(fullHistory,rangeKey);
+  document.getElementById('history-range').textContent=filtered.length?formatDate(filtered[0].date)+' – '+formatDate(filtered[filtered.length-1].date):'';
+  Charts.portfolioHistory('chart-history',filtered);
+}
+document.getElementById('range-select').addEventListener('change',e=>renderHistoryChart(e.target.value));
 
 function showError(msg){
   document.getElementById('hero-date').textContent='Error';
@@ -200,9 +232,12 @@ async function init(){
       :'<div class="card"><p class="empty">No positions. <a href="upload.html">Upload a statement</a>.</p></div>';
 
     Charts.sectorBars('sector-alloc',positions,snap);
-    document.getElementById('history-range').textContent=history.length?formatDate(history[0].date)+' – '+formatDate(history[history.length-1].date):'';
-    Charts.portfolioHistory('chart-history',history);
-    if(positions.length) Charts.performanceBar('chart-performers',positions);
+    fullHistory=history;
+    renderHistoryChart(document.getElementById('range-select').value||'all');
+    if(positions.length){
+      Charts.performanceBar('chart-performers',positions,7,'best');
+      Charts.performanceBar('chart-performers-worst',positions,7,'worst');
+    }
   }catch(e){showError(e.message);console.error(e);}
 }
 init();
