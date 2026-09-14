@@ -54,6 +54,7 @@
     <div class="kpi-card"><div class="kpi-label">vs Last Month</div><div class="kpi-value" id="kpi-mom">—</div><div class="kpi-sub" id="kpi-mom-sub"></div></div>
     <div class="kpi-card"><div class="kpi-label">YTD Change</div><div class="kpi-value" id="kpi-ytd">—</div><div class="kpi-sub">Jan 1 → today</div></div>
     <div class="kpi-card"><div class="kpi-label">Net Invested</div><div class="kpi-value" id="kpi-invested">—</div><div class="kpi-sub">Since Mar 2020</div></div>
+    <div class="kpi-card"><div class="kpi-label">CAD Holdings</div><div class="kpi-value" id="kpi-cad">—</div><div class="kpi-sub"></div></div>
     <div class="kpi-card"><div class="kpi-label">USD Holdings</div><div class="kpi-value" id="kpi-usd">—</div><div class="kpi-sub" id="kpi-fx"></div></div>
     <div class="kpi-card"><div class="kpi-label">Positions</div><div class="kpi-value" id="kpi-pos">—</div><div class="kpi-sub" id="kpi-pos-sub"></div></div>
     <div class="kpi-card"><div class="kpi-label">Cash on Hand</div><div class="kpi-value" id="kpi-cash-cad">—</div><div class="kpi-sub" id="kpi-cash-usd"></div></div>
@@ -157,6 +158,7 @@ async function init(){
     kY.textContent=snap.market_change_ytd!=null?formatCAD(snap.market_change_ytd):'—';
     kY.className='kpi-value '+((snap.market_change_ytd||0)>=0?'positive':'negative');
     document.getElementById('kpi-invested').textContent=snap.net_invested_inception!=null?formatCAD(snap.net_invested_inception):'—';
+    document.getElementById('kpi-cad').textContent=snap.cad_holdings!=null?formatCAD(snap.cad_holdings):'—';
     document.getElementById('kpi-usd').textContent=snap.usd_holdings_usd!=null?formatUSD(snap.usd_holdings_usd):'—';
     document.getElementById('kpi-fx').textContent=snap.fx_rate?'@ '+snap.fx_rate.toFixed(4)+' USD/CAD':'';
     document.getElementById('kpi-pos').textContent=positions.length||'—';
@@ -197,7 +199,7 @@ async function init(){
         }).join('')+'</div>'
       :'<div class="card"><p class="empty">No positions. <a href="upload.html">Upload a statement</a>.</p></div>';
 
-    Charts.sectorBars('sector-alloc',positions);
+    Charts.sectorBars('sector-alloc',positions,snap);
     document.getElementById('history-range').textContent=history.length?formatDate(history[0].date)+' – '+formatDate(history[history.length-1].date):'';
     Charts.portfolioHistory('chart-history',history);
     if(positions.length) Charts.performanceBar('chart-performers',positions);
