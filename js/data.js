@@ -52,6 +52,14 @@ const Data = {
     return [...new Set((d.positions || []).map(p => p.date))].sort();
   },
 
+  // Full positions history across every snapshot date (not just the latest).
+  // Used to backfill return_last_month / return_last_year when the stored
+  // value is missing, by looking up the same ticker's price ~1mo / ~12mo back.
+  async allPositions() {
+    const d = await this.load();
+    return d.positions || [];
+  },
+
   async transactions() {
     const d = await this.load();
     return [...(d.transactions || [])].sort((a, b) => b.date.localeCompare(a.date));
@@ -60,6 +68,11 @@ const Data = {
   async income() {
     const d = await this.load();
     return [...(d.income || [])].sort((a, b) => b.date.localeCompare(a.date));
+  },
+
+  async cashflows() {
+    const d = await this.load();
+    return d.cashflows || {};
   },
 
   async merge(parsed) {
