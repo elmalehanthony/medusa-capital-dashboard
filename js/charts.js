@@ -23,7 +23,13 @@ const Charts = {
         labels,
         datasets:[
           {label:'Portfolio',data:snapshots.map(s=>s.total_cad),borderColor:'#0066CC',backgroundColor:'rgba(0,102,204,0.06)',borderWidth:2,fill:true,tension:0.4,pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:'#0066CC'},
-          {label:'Net Invested',data:snapshots.map(s=>s.net_invested_inception),borderColor:'#C4C4C4',borderWidth:1.5,borderDash:[4,4],fill:false,tension:0.4,pointRadius:0}
+          // Thomas: "net invested" line is too easy to miss against the portfolio
+          // line — was a thin light-gray dash. Now a bolder, distinct amber so it
+          // reads clearly at a glance, and it always spans the full range passed
+          // in (portfolio.json has net_invested_inception for all 78 months back
+          // to account inception, so this isn't truncated unless the date-range
+          // selector itself is set to a shorter window).
+          {label:'Net Invested',data:snapshots.map(s=>s.net_invested_inception),borderColor:'#B45309',borderWidth:2,borderDash:[6,3],fill:false,tension:0.4,pointRadius:0}
         ]
       },
       options:{
@@ -35,7 +41,7 @@ const Charts = {
         },
         scales:{
           x:{ticks:{color:t.textColor,font:{size:10}},grid:{color:t.gridColor},border:{display:false}},
-          y:{ticks:{color:t.textColor,font:{size:10},callback:v=>' '+(v/1000).toFixed(0)+'k'},grid:{color:t.gridColor},border:{display:false}}
+          y:{ticks:{color:t.textColor,font:{size:10},callback:v=>'$'+(v/1000).toFixed(0)+'k'},grid:{color:t.gridColor},border:{display:false}}
         }
       }
     });
@@ -83,11 +89,16 @@ const Charts = {
     }).join('');
   },
 
-  performanceBar(canvasId, positions, count=12){
+  // order: 'best' (default, highest return first) or 'worst' (lowest/most
+  // negative return first) — Thomas asked for a worst-performers view
+  // alongside the existing top-performers one.
+  performanceBar(canvasId, positions, count=12, order='best'){
     this.destroy(canvasId);
     const ctx=document.getElementById(canvasId); if(!ctx)return;
     const t=this._theme();
-    const sorted=[...positions].filter(p=>p.return_inception!=null).sort((a,b)=>b.return_inception-a.return_inception).slice(0,count);
+    const sorted=[...positions].filter(p=>p.return_inception!=null)
+      .sort((a,b)=>order==='worst'?a.return_inception-b.return_inception:b.return_inception-a.return_inception)
+      .slice(0,count);
     this._i[canvasId]=new Chart(ctx,{
       type:'bar',
       data:{
