@@ -35,7 +35,7 @@ const Charts = {
         },
         scales:{
           x:{ticks:{color:t.textColor,font:{size:10}},grid:{color:t.gridColor},border:{display:false}},
-          y:{ticks:{color:t.textColor,font:{size:10},callback:v=>'$'+(v/1000).toFixed(0)+'k'},grid:{color:t.gridColor},border:{display:false}}
+          y:{ticks:{color:t.textColor,font:{size:10},callback:v=>' '+(v/1000).toFixed(0)+'k'},grid:{color:t.gridColor},border:{display:false}}
         }
       }
     });
@@ -59,17 +59,24 @@ const Charts = {
     });
   },
 
-  sectorBars(containerId, positions){
+  sectorBars(containerId, positions, snap){
     const el=document.getElementById(containerId); if(!el)return;
     const map={};let total=0;
     positions.forEach(p=>{const s=p.sector||'Other';const v=p.current_value_cad||0;map[s]=(map[s]||0)+v;total+=v;});
-    const sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,7);
-    const COLORS=['#0066CC','#00A86B','#6644DD','#C07A00','#E03131','#0088AA','#888780'];
+    // Include cash as its own bucket (Thomas: "Include cash" in sector allocation),
+    // converted to CAD using the snapshot's own fx rate.
+    if(snap){
+      const cashCAD=(snap.cash_cad||0)+(snap.cash_usd||0)*(snap.fx_rate||1);
+      if(cashCAD){ map['Cash']=(map['Cash']||0)+cashCAD; total+=cashCAD; }
+    }
+    // Show every sector, not just the top 7 (Thomas: "should show all sectors rather than top 7").
+    const sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]);
+    const COLORS=['#0066CC','#00A86B','#6644DD','#C07A00','#E03131','#0088AA','#888780','#CC3388','#22AACC','#996633','#556B2F','#8844AA','#444444'];
     el.innerHTML=sorted.map(([name,val],i)=>{
       const pct=total>0?val/total*100:0;
       return `<div class="alloc-row">
         <div class="alloc-label">${name}</div>
-        <div class="alloc-bar-wrap"><div class="alloc-bar" style="width:${pct.toFixed(1)}%;background:${COLORS[i]}"></div></div>
+        <div class="alloc-bar-wrap"><div class="alloc-bar" style="width:${pct.toFixed(1)}%;background:${COLORS[i % COLORS.length]}"></div></div>
         <div class="alloc-pct">${pct.toFixed(1)}%</div>
         <div class="alloc-val">${formatCAD(val)}</div>
       </div>`;
