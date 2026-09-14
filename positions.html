@@ -137,12 +137,10 @@ let allPositions = [], allDates = [], currentSort = { col: 'current_value_cad', 
 const isMobile = () => window.innerWidth < 768;
 
 function enrichPositions(positions, totalCAD) {
-  return Analytics.positionPnL(positions, totalCAD).map(p => ({
-    ...p,
-    unrealizedGain: p.current_value_cad - (p.total_cost || p.shares * p.cost_per_share || 0),
-    unrealizedPct: p.return_inception,
-    weight: totalCAD ? p.current_value_cad / totalCAD : null
-  }));
+  // Analytics.positionPnL already computes unrealizedGain (FX-converted to
+  // CAD), unrealizedPct, and weight correctly — don't recompute here, that
+  // was silently re-introducing the USD-cost-vs-CAD-value currency bug.
+  return Analytics.positionPnL(positions, totalCAD);
 }
 
 function renderSummary(positions, snap) {
