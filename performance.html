@@ -50,7 +50,8 @@
     <span style="font-size:11px;color:var(--ink-4)" id="bench-label"></span>
   </div>
   <div class="card" id="bench-card">
-    <div style="display:flex;gap:32px;margin-bottom:20px;flex-wrap:wrap">
+    <div id="bench-warning" style="display:none"></div>
+    <div id="bench-cols" style="display:flex;gap:32px;margin-bottom:20px;flex-wrap:wrap">
       <div>
         <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink-4);font-weight:700;margin-bottom:14px">Last Month</div>
         <div id="bench-lm"><p class="empty">No benchmark data for this snapshot</p></div>
@@ -280,20 +281,31 @@ async function init(){
     // show an explicit stale-data warning instead of numbers that look current.
     const snapWithBench=[...history].reverse().find(s=>s.benchmarks);
     const benchLabelEl=document.getElementById('bench-label');
+    const benchColsEl=document.getElementById('bench-cols');
+    const benchWarnEl=document.getElementById('bench-warning');
     const isCurrent=snapWithBench && snapWithBench.date===snap.date;
     if(snapWithBench?.benchmarks && isCurrent){
       benchLabelEl.textContent='as of '+formatDate(snapWithBench.date);
       benchLabelEl.style.cssText='';
+      benchWarnEl.style.display='none';
+      benchColsEl.style.display='flex';
       renderBenchBlock(snapWithBench.benchmarks['Last Month'],'bench-lm');
       renderBenchBlock(snapWithBench.benchmarks['1 year'],'bench-1y');
     } else if(snapWithBench?.benchmarks){
+      // Bugfix: previously left the "Trailing 12 Months" column's label
+      // header rendered with an empty box underneath it (only the "Last
+      // Month" column got the warning text) — looked broken. Now the whole
+      // two-column layout is hidden and replaced with one clean full-width
+      // warning instead.
       benchLabelEl.textContent='⚠ stale — last captured '+formatDate(snapWithBench.date)+', not '+formatDate(snap.date);
       benchLabelEl.style.cssText='color:var(--red);font-weight:700';
-      const warn='<p style="color:var(--red);font-size:12px;font-weight:600">Benchmark data hasn\'t been captured for '+formatDate(snap.date)+' yet — showing figures from '+formatDate(snapWithBench.date)+' here would misrepresent the current period, so they\'re hidden. Do not compare this section to this month\'s return tiles until updated.</p>';
-      document.getElementById('bench-lm').innerHTML=warn;
-      document.getElementById('bench-1y').innerHTML='';
+      benchColsEl.style.display='none';
+      benchWarnEl.style.display='block';
+      benchWarnEl.innerHTML='<p style="color:var(--red);font-size:13px;font-weight:600;line-height:1.6;margin:4px 0 8px">Benchmark data hasn\'t been captured for '+formatDate(snap.date)+' yet — the most recent figures on file are from '+formatDate(snapWithBench.date)+'. Showing them here would misrepresent the current period, so they\'re hidden until updated. Do not compare this section to this month\'s return tiles.</p>';
     } else {
-      document.getElementById('bench-lm').innerHTML='<p style="color:var(--ink-4);font-size:12px">No benchmark data found. Available for Oct/Dec 2024, Feb/Mar/May 2025, Feb/Apr 2026 snapshots.</p>';
+      benchColsEl.style.display='none';
+      benchWarnEl.style.display='block';
+      benchWarnEl.innerHTML='<p style="color:var(--ink-4);font-size:12px;margin:4px 0 8px">No benchmark data found. Available for Oct/Dec 2024, Feb/Mar/May 2025, Feb/Apr 2026 snapshots.</p>';
     }
 
     // Charts
@@ -335,7 +347,7 @@ async function init(){
 
     // Industry
     document.getElementById('alloc-date').textContent='as of '+formatDate(snap.date);
-    Charts.sectorBars('industry-alloc',positions);
+    Charts.sectorBars('industry-alloc',positions,snap);
 
     renderStockTable();
   }catch(e){console.error(e);document.getElementById('subtitle').textContent='Error: '+e.message;}
